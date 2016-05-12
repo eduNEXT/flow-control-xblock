@@ -1,0 +1,2 @@
+# Requirements for the flow control xblock
+-e .
