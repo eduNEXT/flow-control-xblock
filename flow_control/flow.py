@@ -234,8 +234,8 @@ class FlowCheckPointXblock(XBlock):
     def student_view(self, context=None):
 
         fragment = Fragment(u"<!-- This is the FlowCheckPointXblock -->")
-        fragment.add_javascript(load("static/js/check-point.js"))
-        fragment.initialize_js('SomeFunctionFromXblock')
+        fragment.add_javascript(load("static/js/injection.js"))
+        fragment.initialize_js('FlowControlGoto', json_args={"target": "tab_0"})
 
         return fragment
 
