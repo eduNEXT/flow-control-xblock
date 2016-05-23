@@ -1,9 +1,10 @@
 console.log("Flow-Control Injected");
 
-var cms = {
+var settings = {
   time_to_check: 1,
   tab_togo: null,
-  default_action: 1
+  default_action: 1,
+  target_url:null
 };
 
 var actions = {
@@ -70,31 +71,32 @@ var someTimedOutFunction = function(arg) {
 
 function FlowControlGoto(runtime, element, options) {
   //console.log("Running FlowControlGoto ", options);
-  cms["tab_togo"] = options.default
-  cms["default_action"] = options.action;
+  settings["tab_togo"] = options.default
+  settings["default_action"] = options.action;
+  settings["target_url"] = options.target_url;
 
-  //console.log("tab default", cms["tab_togo"]);
-  console.log("default action", cms["default_action"]);
+  //console.log("tab default", settings["tab_togo"]);
+  console.log("default action", settings["default_action"]);
   //console.log(element);
   
   var targetId = options.target || 'tab_3';
 
-  //Getting xblock runtime element
+  //Getting xblock runtime environment element
   var runtime = $("[data-block-type='check-point']");
 
   //Only apply flow control on LMS runtime
   if (runtime.data("runtime-class") === "LmsRuntime") {
-    switch (cms["default_action"]){
+    switch (settings["default_action"]){
       case actions["no_act"]:
         console.log("no action needed, see render content");
         break;
       case actions["redirect_tab"]:
         execControl(targetId);
-        window.flowControlTimeoutID = window.setTimeout(someTimedOutFunction, TIMEOUT, cms["tab_togo"]);
+        window.flowControlTimeoutID = window.setTimeout(someTimedOutFunction, TIMEOUT, settings["tab_togo"]);
         break;
       case actions["redirect_url"]:
         console.log("toUrl");
-        window.location.replace("http://www.google.com");
+        window.location.replace(settings["target_url"]);
         break;
       case actions["redirect_jump_to"]:
         console.log("jumpTo");
@@ -105,19 +107,4 @@ function FlowControlGoto(runtime, element, options) {
     }  
   }
   
-
-  /*if (cms["default_action"] === "No action"){
-    console.log("no action needed, see render content");
-  }
-
-  if (cms["default_action"] === "Redirect to tab, same section"){
-    execControl(targetId);
-    window.flowControlTimeoutID = window.setTimeout(someTimedOutFunction, TIMEOUT, cms["tab_togo"]);
-  }
-
-  if (cms["default_action"] === "Redirect to tab, same section"){
-    execControl(targetId);
-    window.flowControlTimeoutID = window.setTimeout(someTimedOutFunction, TIMEOUT, cms["tab_togo"]);
-  }*/
-
 }

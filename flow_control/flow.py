@@ -253,10 +253,16 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
                     scope=Scope.content,
                     values_provider=values_genarator)
 
-    to = Integer(help="Number of unit to redirect", default=0,
-                 scope=Scope.content, display_name="Where To")
+    to = Integer(help="Number of unit to redirect",
+                 default=0,
+                 scope=Scope.content,
+                 display_name="Tab to redirect")
 
-    editable_fields = ('action', 'to')
+    target_url = String(help="Url to redirect",
+                        scope=Scope.content,
+                        display_name="URL to redirect")
+
+    editable_fields = ('action', 'to', 'target_url')
 
     display_name = String(
         display_name="Display Name",
@@ -277,7 +283,8 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
         fragment.initialize_js(
             'FlowControlGoto', json_args={"target": "tab_0",
                                           "default": default_tab,
-                                          "action": self.action})
+                                          "action": self.action,
+                                          "target_url": self.target_url})
 
         return fragment
 
