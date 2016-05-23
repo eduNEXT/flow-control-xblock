@@ -59,5 +59,6 @@ setup(
             'check-point = flow_control:FlowCheckPointXblock',
         ],
     },
-    package_data=package_data("flow_control", ["templates", "public", "static"]),
+    package_data=package_data(
+        "flow_control", ["templates", "public", "static"]),
 )

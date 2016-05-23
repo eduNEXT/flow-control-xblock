@@ -245,7 +245,7 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
         return ['No action',
                 'Redirect to tab, same section',
                 'Redirect to URL',
-                'Redirecti using JumpTo'
+                'Redirecti using JumpTo',
                 'Show a message']
 
     action = String(display_name="Action",
@@ -256,7 +256,7 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
     to = Integer(help="Number of unit to redirect", default=0,
                  scope=Scope.content, display_name="Where To")
 
-    editable_fields = ('to', 'action')
+    editable_fields = ('action', 'to')
 
     display_name = String(
         display_name="Display Name",
@@ -276,7 +276,8 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
         fragment.add_javascript(load("static/js/injection.js"))
         fragment.initialize_js(
             'FlowControlGoto', json_args={"target": "tab_0",
-                                          "default": default_tab})
+                                          "default": default_tab,
+                                          "action": self.action})
 
         return fragment
 
