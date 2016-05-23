@@ -2,6 +2,7 @@ console.log("Flow-Control Injected");
 
 var TIMEOUT = 1;
 var moduleElement;
+var tab_togo;
 
 
 var getActiveTab = function(element) {
@@ -52,13 +53,19 @@ var someTimedOutFunction = function(arg) {
   }
 }
 
-
 function FlowControlGoto(runtime, element, options) {
   console.log("Running FlowControlGoto ", options);
+  tab_togo = options.default
 
+  console.log("tab default", tab_togo);
+  
   var targetId = options.target || 'tab_3';
 
   execControl(targetId);
-  window.flowControlTimeoutID = window.setTimeout(someTimedOutFunction, TIMEOUT, targetId);
+  window.flowControlTimeoutID = window.setTimeout(someTimedOutFunction, TIMEOUT, tab_togo);
+
+  $(function ($) {
+        
+  });
 
 }

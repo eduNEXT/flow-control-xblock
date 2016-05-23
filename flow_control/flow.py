@@ -8,6 +8,8 @@ from django.template.context import Context
 from django.template.loader import get_template
 from xblock.core import XBlock
 from xblock.fragment import Fragment
+from xblock.fields import Scope, Integer, String, List
+from xblockutils.studio_editable import StudioEditableXBlockMixin
 
 # # Not strictly xblock
 import courseware
@@ -21,6 +23,7 @@ logger = logging.getLogger(__name__)
 
 
 class ForceNonAtomic:
+
     def __enter__(self):
         self.before = transaction.get_connection().in_atomic_block
         transaction.get_connection().in_atomic_block = False
@@ -78,13 +81,16 @@ class FlowControlXblock(XBlock):
         course = courseware.courses.get_course(self.course_id)
 
         # One way
-        field_data_cache = courseware.model_data.FieldDataCache.cache_for_descriptor_descendents(self.course_id, self.user, course, depth=2)
-        toc = toc_for_course(self.user, request, course, None, None, field_data_cache)
+        field_data_cache = courseware.model_data.FieldDataCache.cache_for_descriptor_descendents(
+            self.course_id, self.user, course, depth=2)
+        toc = toc_for_course(self.user, request, course,
+                             None, None, field_data_cache)
 
         # the other way
         with ForceNonAtomic():
             my_grades = courseware.grades.grade(self.user, request, course)
-            progress_summary = courseware.grades.progress_summary(self.user, request, course)
+            progress_summary = courseware.grades.progress_summary(
+                self.user, request, course)
 
         # # End of Not strictly xblock
 
@@ -201,7 +207,8 @@ class FlowControlXblock(XBlock):
                 return user.username
             else:
                 logger.exception(
-                    "XBlock service could not find user for anonymous_user_id '{}'".format(anonymous_user_id)
+                    "XBlock service could not find user for anonymous_user_id '{}'".format(
+                        anonymous_user_id)
                 )
                 return None
 
@@ -224,18 +231,52 @@ class FlowControlXblock(XBlock):
                 return user
             else:
                 logger.exception(
-                    "XBlock service could not find user for anonymous_user_id '{}'".format(anonymous_user_id)
+                    "XBlock service could not find user for anonymous_user_id '{}'".format(
+                        anonymous_user_id)
                 )
                 return None
 
 
-class FlowCheckPointXblock(XBlock):
+@XBlock.needs("i18n")
+@XBlock.needs("user")
+class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
+
+    def values_genarator(self):
+        return ['No action',
+                'Redirect to tab, same section',
+                'Redirect to URL',
+                'Redirecti using JumpTo'
+                'Show a message']
+
+    action = String(display_name="Action",
+                    help="Select an action to apply flow control",
+                    scope=Scope.content,
+                    values_provider=values_genarator)
+
+    to = Integer(help="Number of unit to redirect", default=0,
+                 scope=Scope.content, display_name="Where To")
+
+    editable_fields = ('to', 'action')
+
+    display_name = String(
+        display_name="Display Name",
+        scope=Scope.settings,
+        default="Flow Control"
+    )
+
+    def resource_string(self, path):
+        """Handy helper for getting resources from our kit."""
+        data = pkg_resources.resource_string(__name__, path)
+        return data.decode("utf8")
 
     def student_view(self, context=None):
 
+        default_tab = 'tab_{}'.format(self.to)
         fragment = Fragment(u"<!-- This is the FlowCheckPointXblock -->")
         fragment.add_javascript(load("static/js/injection.js"))
-        fragment.initialize_js('FlowControlGoto', json_args={"target": "tab_0"})
+        fragment.initialize_js(
+            'FlowControlGoto', json_args={"target": "tab_0",
+                                          "default": default_tab})
 
         return fragment
 
