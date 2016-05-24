@@ -4,22 +4,20 @@ var settings = {
   time_to_check: 1,
   tab_togo: null,
   default_action: 1,
-  target_url:null
+  target_url:null,
+  target_id:null,
+  lms_base_jump_url:"../../../jump_to_id/"
 };
 
 var actions = {
   no_act: "No action",
-  redirect_tab: "Redirect to tab, same section",
+  redirect_tab: "Redirect to tab by id, same section",
   redirect_url: "Redirect to URL",
-  redirect_jump_to: "Redirecti using JumpTo",
+  redirect_jump: "Redirect using jump_to_id",
   show_message: "Show a message"
 };
 
-var TIMEOUT = 1;
 var moduleElement;
-var tab_togo;
-var default_action;
-
 
 var getActiveTab = function(element) {
 
@@ -63,43 +61,41 @@ var someTimedOutFunction = function(arg) {
   }
   else {
     execControl(arg);
-
     console.log("setTimeout");
-    window.flowControlTimeoutID = window.setTimeout(someTimedOutFunction, TIMEOUT, arg);
+    window.flowControlTimeoutID = window.setTimeout(someTimedOutFunction, settings["time_to_check"], arg);
   }
 }
 
 function FlowControlGoto(runtime, element, options) {
-  ///console.log("Running FlowControlGoto ", options);
+
   settings["tab_togo"] = options.default
   settings["default_action"] = options.action;
   settings["target_url"] = options.target_url;
+  settings["target_id"] = settings["lms_base_jump_url"] + options.target_id;
 
-  //console.log("tab default", settings["tab_togo"]);
-  console.log("default action", settings["default_action"]);
-  //console.log(element);
-  
   var targetId = options.target || 'tab_3';
 
   //Getting xblock runtime environment element
   var runtime = $("[data-block-type='check-point']");
 
-  //Only apply flow control on LMS runtime
+  //Only apply flow control actions on LMS runtime
   if (runtime.data("runtime-class") === "LmsRuntime") {
+    
     switch (settings["default_action"]){
       case actions["no_act"]:
-        console.log("no action needed, see render content");
+        console.log("no action needed");
         break;
       case actions["redirect_tab"]:
         execControl(targetId);
-        window.flowControlTimeoutID = window.setTimeout(someTimedOutFunction, TIMEOUT, settings["tab_togo"]);
+        window.flowControlTimeoutID = window.setTimeout(someTimedOutFunction, 
+                                        settings["time_to_check"], 
+                                        settings["tab_togo"]);
         break;
       case actions["redirect_url"]:
-        console.log("toUrl");
-        window.location.replace(settings["target_url"]);
+        location.href = settings["target_url"];
         break;
-      case actions["redirect_jump_to"]:
-        console.log("jumpTo");
+      case actions["redirect_jump"]:
+        location.href = settings["target_id"];
         break;
       case actions["show_message"]:
         console.log("showMessage");

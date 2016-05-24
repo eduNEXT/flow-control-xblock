@@ -8,7 +8,7 @@ from django.template.context import Context
 from django.template.loader import get_template
 from xblock.core import XBlock
 from xblock.fragment import Fragment
-from xblock.fields import Scope, Integer, String, List
+from xblock.fields import Scope, Integer, String
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 
 # # Not strictly xblock
@@ -241,11 +241,17 @@ class FlowControlXblock(XBlock):
 @XBlock.needs("user")
 class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
 
+    display_name = String(
+        display_name="Display Name",
+        scope=Scope.settings,
+        default="Flow Control"
+    )
+
     def values_genarator(self):
         return ['No action',
-                'Redirect to tab, same section',
+                'Redirect to tab by id, same section',
                 'Redirect to URL',
-                'Redirecti using JumpTo',
+                'Redirect using jump_to_id',
                 'Show a message']
 
     action = String(display_name="Action",
@@ -262,13 +268,11 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
                         scope=Scope.content,
                         display_name="URL to redirect")
 
-    editable_fields = ('action', 'to', 'target_url')
+    target_id = String(help="Unit id to redirect",
+                       scope=Scope.content,
+                       display_name="Id to redirect")
 
-    display_name = String(
-        display_name="Display Name",
-        scope=Scope.settings,
-        default="Flow Control"
-    )
+    editable_fields = ('action', 'to', 'target_url', 'target_id')
 
     def resource_string(self, path):
         """Handy helper for getting resources from our kit."""
@@ -284,7 +288,8 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
             'FlowControlGoto', json_args={"target": "tab_0",
                                           "default": default_tab,
                                           "action": self.action,
-                                          "target_url": self.target_url})
+                                          "target_url": self.target_url,
+                                          "target_id": self.target_id})
 
         return fragment
 
