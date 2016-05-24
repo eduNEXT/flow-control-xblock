@@ -50,7 +50,7 @@ var someTimedOutFunction = function(arg) {
   var $activeTab = getActiveTab(moduleElement);  // Que pasa si no encuentra un active tab?
   var currentID = $activeTab.attr("id");
 
-  console.log("tic " + arg + " " + currentID);
+  //console.log("tic " + arg + " " + currentID);
 
   if (currentID === arg){
     console.log("clearTimeout");
@@ -73,7 +73,7 @@ function FlowControlGoto(runtime, element, options) {
   settings["target_url"] = options.target_url;
   settings["target_id"] = settings["lms_base_jump_url"] + options.target_id;
 
-  var targetId = options.target || 'tab_3';
+  //var targetId = options.target;
 
   //Getting xblock runtime environment element
   var runtime = $("[data-block-type='check-point']");
@@ -86,7 +86,7 @@ function FlowControlGoto(runtime, element, options) {
         console.log("no action needed");
         break;
       case actions["redirect_tab"]:
-        execControl(targetId);
+        //execControl(targetId);
         window.flowControlTimeoutID = window.setTimeout(someTimedOutFunction, 
                                         settings["time_to_check"], 
                                         settings["tab_togo"]);
