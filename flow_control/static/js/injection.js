@@ -70,7 +70,7 @@ var someTimedOutFunction = function(arg) {
 }
 
 function FlowControlGoto(runtime, element, options) {
-  //console.log("Running FlowControlGoto ", options);
+  ///console.log("Running FlowControlGoto ", options);
   settings["tab_togo"] = options.default
   settings["default_action"] = options.action;
   settings["target_url"] = options.target_url;
