@@ -20,7 +20,28 @@ var actions = {
 };
 
 var viewblocks = {
-  seqContent: $("#seq_content")
+  seqContent: $("#seq_content"),
+  hideNotAllowedOption: function (){
+    $("#settings-tab > ul > li").filter('[data-field-name!="action"]').hide()
+    
+    switch ($("#xb-field-edit-action").val()){
+
+      case actions["redirect_tab"]:
+        $("#settings-tab > ul > li").filter('[data-field-name="to"]').show()
+        break;
+      case actions["redirect_url"]:
+        $("#settings-tab > ul > li").filter('[data-field-name="target_url"]').show()
+        break;
+      case actions["redirect_jump"]:
+        $("#settings-tab > ul > li").filter('[data-field-name="target_id"]').show()
+        break;
+      case actions["show_message"]:
+        $("#settings-tab > ul > li").filter('[data-field-name="message"]').show()
+        break;
+      
+    }  
+  
+  }
 };
 
 var moduleElement;
@@ -118,7 +139,7 @@ function FlowControlGoto(runtime, element, options) {
   if (runtime.data("runtime-class") === "PreviewRuntime") {
     
     $("body").on("change","#xb-field-edit-action",function(){
-          console.log("change");
+          viewblocks.hideNotAllowedOption();
     });
     
   }
