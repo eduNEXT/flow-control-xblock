@@ -272,7 +272,12 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
                        scope=Scope.content,
                        display_name="Id to redirect")
 
-    editable_fields = ('action', 'to', 'target_url', 'target_id')
+    message = String(help="Write a message for LMS users",
+                     scope=Scope.content,
+                     display_name="Message",
+                     multiline_editor='html')
+
+    editable_fields = ('action', 'to', 'target_url', 'target_id', 'message')
 
     def resource_string(self, path):
         """Handy helper for getting resources from our kit."""
@@ -287,9 +292,11 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
         fragment.initialize_js(
             'FlowControlGoto', json_args={"target": "tab_0",
                                           "default": default_tab,
+                                          "default_tab_id": self.to,
                                           "action": self.action,
                                           "target_url": self.target_url,
-                                          "target_id": self.target_id})
+                                          "target_id": self.target_id,
+                                          "message": self.message})
 
         return fragment
 

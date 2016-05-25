@@ -3,10 +3,12 @@ console.log("Flow-Control Injected");
 var settings = {
   time_to_check: 1,
   tab_togo: null,
+  default_tab_id:null,
   default_action: 1,
   target_url:null,
   target_id:null,
-  lms_base_jump_url:"../../../jump_to_id/"
+  lms_base_jump_url:"../../../jump_to_id/",
+  message:null
 };
 
 var actions = {
@@ -15,6 +17,10 @@ var actions = {
   redirect_url: "Redirect to URL",
   redirect_jump: "Redirect using jump_to_id",
   show_message: "Show a message"
+};
+
+var viewblocks = {
+  seqContent: $("#seq_content")
 };
 
 var moduleElement;
@@ -51,6 +57,7 @@ var someTimedOutFunction = function(arg) {
   var currentID = $activeTab.attr("id");
 
   //console.log("tic " + arg + " " + currentID);
+  var allTabs =$("div[id^='seq_contents_']");
 
   if (currentID === arg){
     console.log("clearTimeout");
@@ -63,6 +70,7 @@ var someTimedOutFunction = function(arg) {
     execControl(arg);
     console.log("setTimeout");
     window.flowControlTimeoutID = window.setTimeout(someTimedOutFunction, settings["time_to_check"], arg);
+
   }
 }
 
@@ -72,7 +80,8 @@ function FlowControlGoto(runtime, element, options) {
   settings["default_action"] = options.action;
   settings["target_url"] = options.target_url;
   settings["target_id"] = settings["lms_base_jump_url"] + options.target_id;
-
+  settings["default_tab_id"] = options.default_tab_id;
+  settings["message"] = options.message;
   //var targetId = options.target;
 
   //Getting xblock runtime environment element
@@ -87,20 +96,31 @@ function FlowControlGoto(runtime, element, options) {
         break;
       case actions["redirect_tab"]:
         //execControl(targetId);
+        viewblocks["seqContent"].empty();
         window.flowControlTimeoutID = window.setTimeout(someTimedOutFunction, 
                                         settings["time_to_check"], 
                                         settings["tab_togo"]);
         break;
       case actions["redirect_url"]:
+        viewblocks["seqContent"].empty();
         location.href = settings["target_url"];
         break;
       case actions["redirect_jump"]:
+        viewblocks["seqContent"].empty();
         location.href = settings["target_id"];
         break;
       case actions["show_message"]:
-        console.log("showMessage");
+        viewblocks["seqContent"].html(settings["message"]);
         break;
     }  
+  }
+
+  if (runtime.data("runtime-class") === "PreviewRuntime") {
+    
+    $("body").on("change","#xb-field-edit-action",function(){
+          console.log("change");
+    });
+    
   }
   
 }
