@@ -286,17 +286,28 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
 
     def student_view(self, context=None):
 
-        default_tab = 'tab_{}'.format(self.to)
+        index_base = 1
+        default_tab = 'tab_{}'.format(self.to - index_base)
         fragment = Fragment(u"<!-- This is the FlowCheckPointXblock -->")
         fragment.add_javascript(load("static/js/injection.js"))
         fragment.initialize_js(
-            'FlowControlGoto', json_args={"target": "tab_0",
+            'FlowControlGoto', json_args={"display_name": self.display_name,
                                           "default": default_tab,
                                           "default_tab_id": self.to,
                                           "action": self.action,
                                           "target_url": self.target_url,
                                           "target_id": self.target_id,
                                           "message": self.message})
+
+        return fragment
+
+    def studio_view(self, context=None):
+
+        fragment = super(FlowCheckPointXblock,
+                         self).studio_view(context=context)
+
+        fragment.add_javascript(load("static/js/injection.js"))  # We could also move this function to a different file
+        fragment.initialize_js('EditFlowControl')
 
         return fragment
 
