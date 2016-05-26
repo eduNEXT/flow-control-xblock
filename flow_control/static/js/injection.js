@@ -1,4 +1,3 @@
-console.log("Flow-Control Injected");
 
 var settings = {
   time_to_check: 1,
@@ -23,7 +22,7 @@ var viewblocks = {
   seqContent: $("#seq_content"),
   hideNotAllowedOption: function (){
     $("#settings-tab > ul > li").filter('[data-field-name!="action"]').hide()
-    
+
     switch ($("#xb-field-edit-action").val()){
 
       case actions["redirect_tab"]:
@@ -38,15 +37,13 @@ var viewblocks = {
       case actions["show_message"]:
         $("#settings-tab > ul > li").filter('[data-field-name="message"]').show()
         break;
-      
-    }  
-  
+
+    }
+
   }
 };
 
-var moduleElement;
-
-var getActiveTab = function(element) {
+var getActiveTab = function() {
 
   // Find the ID of the active vertical
   // var activeVerticalID = $(element).closest(".xblock-student_view-vertical").data("usage-id");
@@ -72,30 +69,45 @@ var execControl = function(arg) {
   // TODO: can we make this silent. E.g. that it does not post to /handler/xmodule_handler/goto_position
 }
 
-var someTimedOutFunction = function(arg) {
+var redirectToTab = function(arg) {
 
-  var $activeTab = getActiveTab(moduleElement);  // Que pasa si no encuentra un active tab?
-  var currentID = $activeTab.attr("id");
+  var $activeTab = getActiveTab(),
+      currentID = $activeTab.attr("id"),
+      allTabs = $("#sequence-list a"),
+      first_tab_index = 0,
+      first_tab = "tab_" + first_tab_index,
+      last_tab_index = allTabs.length - 1,
+      last_tab = "tab_" + last_tab_index;
 
-  //console.log("tic " + arg + " " + currentID);
-  var allTabs =$("div[id^='seq_contents_']");
+  console.log("tic " + arg + " " + currentID);
 
   if (currentID === arg){
-    console.log("clearTimeout");
     window.clearTimeout(window.flowControlTimeoutID);
 
     // Fix posible errors on the .active classes
     $activeTab.parent().siblings().find(".active").removeClass("active");
   }
   else {
-    execControl(arg);
-    console.log("setTimeout");
-    window.flowControlTimeoutID = window.setTimeout(someTimedOutFunction, settings["time_to_check"], arg);
+    var whereTo = null;
+    if (settings["default_tab_id"] > last_tab_index) {
+      whereTo = last_tab;
+    }
+    if (settings["default_tab_id"] < first_tab_index) {
+      whereTo = first_tab;
+    }
+    if (first_tab_index <= settings["default_tab_id"] && settings["default_tab_id"] <= last_tab_index) {
+      whereTo = arg;
+    }
+
+    execControl(whereTo);
+    window.flowControlTimeoutID = window.setTimeout(redirectToTab, settings["time_to_check"], whereTo);
 
   }
 }
 
 function FlowControlGoto(runtime, element, options) {
+
+
 
   settings["tab_togo"] = options.default
   settings["default_action"] = options.action;
@@ -110,16 +122,14 @@ function FlowControlGoto(runtime, element, options) {
 
   //Only apply flow control actions on LMS runtime
   if (runtime.data("runtime-class") === "LmsRuntime") {
-    
+
     switch (settings["default_action"]){
       case actions["no_act"]:
-        console.log("no action needed");
         break;
       case actions["redirect_tab"]:
-        //execControl(targetId);
         viewblocks["seqContent"].empty();
-        window.flowControlTimeoutID = window.setTimeout(someTimedOutFunction, 
-                                        settings["time_to_check"], 
+        window.flowControlTimeoutID = window.setTimeout(redirectToTab,
+                                        settings["time_to_check"],
                                         settings["tab_togo"]);
         break;
       case actions["redirect_url"]:
@@ -133,15 +143,25 @@ function FlowControlGoto(runtime, element, options) {
       case actions["show_message"]:
         viewblocks["seqContent"].html(settings["message"]);
         break;
-    }  
+    }
   }
 
   if (runtime.data("runtime-class") === "PreviewRuntime") {
-    
+
+    $("header.xblock-header-check-point li.action-item.action-visibility").hide();
+    $("header.xblock-header-check-point li.action-item.action-duplicate").hide();
+
+  }
+}
+
+function EditFlowControl(runtime, element) {
+
+    // Call to StudioEditableXblockMixin function in order to initialize xblock correctly
+    window.StudioEditableXBlockMixin(runtime, element);
+
+    viewblocks.hideNotAllowedOption();
+
     $("body").on("change","#xb-field-edit-action",function(){
           viewblocks.hideNotAllowedOption();
     });
-    
-  }
-  
 }
