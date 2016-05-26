@@ -161,7 +161,7 @@ function EditFlowControl(runtime, element) {
 
     viewblocks.hideNotAllowedOption();
 
-    $("body").on("change","#xb-field-edit-action",function(){
+    $("#xb-field-edit-action").on("change",function(){
           viewblocks.hideNotAllowedOption();
     });
 }
