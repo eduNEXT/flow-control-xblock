@@ -1,6 +1,6 @@
-"""
-"""
-import json
+""" Flow Control Xblock allows to provide distinct
+path courses according to certain conditions """
+
 import logging
 import pkg_resources
 
@@ -249,17 +249,44 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
         default="Flow Control"
     )
 
-    def values_genarator(self):
+    def actions_genarator(self):
         return ['No action',
                 'Redirect to tab by id, same section',
                 'Redirect to URL',
                 'Redirect using jump_to_id',
                 'Show a message']
 
+    def conditions_genarator(self):
+        return ['Grade on certain problem',
+                'Grade on certain section']
+
+    def operators_genarator(self):
+        return ['equal',
+                'distinct',
+                'less than or equal to',
+                'greater than or equal to',
+                'less than',
+                'greater than']
+
     action = String(display_name="Action",
                     help="Select an action to apply flow control",
                     scope=Scope.content,
-                    values_provider=values_genarator)
+                    values_provider=actions_genarator)
+
+    condition = String(display_name="Conditon",
+                       help="Select a conditon to apply flow control",
+                       scope=Scope.content,
+                       values_provider=conditions_genarator)
+
+    operator = String(display_name="Comparison type",
+                      help="Select a operator to check the condition",
+                      scope=Scope.content,
+                      values_provider=operators_genarator)
+
+    ref_value = Integer(help="Value to use for comparison",
+                        default=0,
+                        scope=Scope.content,
+                        display_name="Score percentage")
 
     to = Integer(help="Number of unit to redirect",
                  default=0,
@@ -279,28 +306,97 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
                      display_name="Message",
                      multiline_editor='html')
 
-    editable_fields = ('action', 'to', 'target_url', 'target_id', 'message')
+    problem_id = String(help="Problem Id to apply condition",
+                        scope=Scope.content,
+                        display_name="Problem Id")
+
+    section_id = String(help="Section Id that to apply condition",
+                        scope=Scope.content,
+                        display_name="Section Id")
+
+    editable_fields = ('condition',
+                       'problem_id',
+                       'section_id',
+                       'operator',
+                       'ref_value',
+                       'action',
+                       'to',
+                       'target_url',
+                       'target_id',
+                       'message'
+                       )
 
     def resource_string(self, path):
         """Handy helper for getting resources from our kit."""
         data = pkg_resources.resource_string(__name__, path)
         return data.decode("utf8")
 
+    def get_location_string(self, resource):
+        course_prefix = 'course'
+        course_url = self.course_id.to_deprecated_string()
+        course_url = course_url.split(course_prefix)[-1]
+
+        location_string = '{}{}+{}@{}+{}@{}'.format(
+            self.course_id.BLOCK_PREFIX,
+            course_url,
+            self.course_id.BLOCK_TYPE_PREFIX,
+            resource,
+            self.course_id.BLOCK_PREFIX,
+            self.problem_id)
+
+        return location_string
+
+    def get_condition_status(self):
+        resource = None
+        condition_reached = None
+
+        if self.condition == 'Grade on certain problem':
+            resource = 'problem'
+            condition_reached = self.condition_problem(
+                self.get_location_string(resource))
+
+        if self.condition == 'Grade on certain section':
+            resource = 'vertical'
+            condition_reached = False
+
+        return condition_reached
+
     def student_view(self, context=None):
 
+        fragment = Fragment(u"<!-- This is the FlowCheckPointXblock -->")
+        fragment.add_javascript(
+            self.resource_string("static/js/injection.js"))
+
+        # helper variables
+        in_studio_runtime = hasattr(self.xmodule_runtime, 'is_author_mode')
         index_base = 1
         default_tab = 'tab_{}'.format(self.to - index_base)
-        fragment = Fragment(u"<!-- This is the FlowCheckPointXblock -->")
-        if not self.condition_subsection():
-            fragment.add_javascript(load("static/js/injection.js"))
+        condition_reached = self.get_condition_status()
+        if condition_reached:
             fragment.initialize_js(
-                'FlowControlGoto', json_args={"display_name": self.display_name,
-                                              "default": default_tab,
-                                              "default_tab_id": self.to,
-                                              "action": self.action,
-                                              "target_url": self.target_url,
-                                              "target_id": self.target_id,
-                                              "message": self.message})
+                'FlowControlGoto',
+                json_args={"display_name": self.display_name,
+                           "default": default_tab,
+                           "default_tab_id": self.to,
+                           "action": self.action,
+                           "target_url": self.target_url,
+                           "target_id": self.target_id,
+                           "message": self.message,
+                           "condition_reached": condition_reached,
+                           "in_studio_runtime": in_studio_runtime})
+        else:
+            fragment.initialize_js('StudioFlowControl')
+
+        return fragment
+
+    def author_view(self, context=None):
+
+        # creating xblock fragment
+        # TO-DO display for studio with setting resume
+        fragment = Fragment(u"<!-- This is the studio -->")
+        fragment.add_javascript(
+            self.resource_string("static/js/injection.js"))
+        fragment.initialize_js('StudioFlowControl')
 
         return fragment
 
@@ -309,29 +405,46 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
         fragment = super(FlowCheckPointXblock,
                          self).studio_view(context=context)
 
-        fragment.add_javascript(load("static/js/injection.js"))  # We could also move this function to a different file
+        # We could also move this function to a different file
+        fragment.add_javascript(load("static/js/injection.js"))
         fragment.initialize_js('EditFlowControl')
 
         return fragment
 
-    def condition_problem(self):
-        # This str is an example of a problem identifier (gotten from the staff debug panel)
-        location_str = "block-v1:edX+DemoX+Demo_Course+type@problem+block@bf74f381c28149829437cbc8d516ad6d"
+    def condition_problem(self, location_str):
+
         usage_key = UsageKey.from_string(location_str)
         user_id = self.xmodule_runtime.user_id
 
-        scores_client = courseware.model_data.ScoresClient(self.course_id, user_id)
+        scores_client = courseware.model_data.ScoresClient(
+            self.course_id, user_id)
         scores_client.fetch_scores([usage_key])
-
         score = scores_client.get(usage_key)
-        return score.total == score.correct
+        if score:
+            # seleccionar el operador correcto y comparar contra el correcto
+            percentage = score.correct / score.total
+            # import ipdb; ipdb.set_trace()
+            print percentage
+            return score.total == score.correct
+
+        return False
+
+    @XBlock.json_handler
+    def condition_status_handler(self, data, suffix=''):
+        """  Returns the actual condition state  """
+
+        return {
+            'success': True,
+            'status': self.get_condition_status()
+        }
 
     def condition_subsection(self):
 
         # url_name = "c23b546c327a48fab9a6d352a64550af"  # xblock testing (section) -> chapter
         # url_name = "workflow"                          # edx_exams (subseccion)   -> sequential
         # url_name = "42cd641b48ea4326b91765a9d60d3272"  # all the evil (subsection)
-        # block    = "vertical_ac391cde8a91"             # limited checks (vertical)
+        # block    = "vertical_ac391cde8a91"             # limited checks
+        # (vertical)
 
         # location_str = "block-v1:edX+DemoX+Demo_Course+type@chapter+block@c23b546c327a48fab9a6d352a64550af"
         # location_str = "block-v1:edX+DemoX+Demo_Course+type@sequential+block@workflow"
