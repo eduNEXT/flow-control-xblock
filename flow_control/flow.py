@@ -67,17 +67,17 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
                 'greater than']
 
     action = String(display_name="Action",
-                    help="Select an action to apply flow control",
+                    help="Select an action to apply given the condition",
                     scope=Scope.content,
                     values_provider=actions_genarator)
 
-    condition = String(display_name="Conditon",
-                       help="Select a conditon to apply flow control",
+    condition = String(display_name="Condition",
+                       help="Select a conditon to check",
                        scope=Scope.content,
                        values_provider=conditions_genarator)
 
     operator = String(display_name="Comparison type",
-                      help="Select a operator to check the condition",
+                      help="Select a operator to evaluate the condition",
                       scope=Scope.content,
                       values_provider=operators_genarator)
 
@@ -86,16 +86,16 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
                         scope=Scope.content,
                         display_name="Score percentage")
 
-    to = Integer(help="Number of unit to redirect",
+    to = Integer(help="Number of unit tab to redirect",
                  default=0,
                  scope=Scope.content,
                  display_name="Tab to redirect")
 
-    target_url = String(help="Url to redirect",
+    target_url = String(help="Url to redirect, supports relative or absolute urls",
                         scope=Scope.content,
                         display_name="URL to redirect")
 
-    target_id = String(help="Unit id to redirect",
+    target_id = String(help="Unit Id to redirect",
                        scope=Scope.content,
                        display_name="Id to redirect")
 
@@ -104,11 +104,13 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
                      display_name="Message",
                      multiline_editor='html')
 
-    problem_id = String(help="Problem Id to apply condition",
+    problem_id = String(help="Problem Id to check the condition",
                         scope=Scope.content,
                         display_name="Problem Id")
 
-    list_of_problems = String(help="List of problems Ids separated by space to apply condition",
+    list_of_problems = String(help="List of problems Ids separated by spaces to check"
+                                    " the condition. Each score is calculated independently"
+                                    " then an overall score is obtained",
                               scope=Scope.content,
                               display_name="List of problems",
                               multiline_editor=True,
