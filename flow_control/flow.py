@@ -8,11 +8,8 @@ from xblock.core import XBlock
 from xblock.fragment import Fragment
 from xblock.fields import Scope, Integer, String
 from xblockutils.studio_editable import StudioEditableXBlockMixin
-
-# # Not strictly xblock
 from courseware.model_data import ScoresClient
 from opaque_keys.edx.keys import UsageKey
-# # End of Not strictly xblock
 
 
 logger = logging.getLogger(__name__)
@@ -109,8 +106,8 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
                         display_name="Problem Id")
 
     list_of_problems = String(help="List of problems Ids separated by spaces to check"
-                                    " the condition. Each score is calculated independently"
-                                    " then an overall score is obtained",
+                              " the condition. Each score is calculated independently"
+                              " then an overall score is obtained",
                               scope=Scope.content,
                               display_name="List of problems",
                               multiline_editor=True,
@@ -159,7 +156,7 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
 
         if self.condition == 'Grade on certain list of problems':
             problems = self.list_of_problems.split()
-            condition_reached = self.condition_subsection(problems)
+            condition_reached = self.condition_on_problem_list(problems)
 
         return condition_reached
 
@@ -249,7 +246,7 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
 
         return self.compare_scores(score.correct, score.total)
 
-    def condition_subsection(self, problems):
+    def condition_on_problem_list(self, problems):
         user_id = self.xmodule_runtime.user_id
         scores_client = ScoresClient(self.course_id, user_id)
         total = 0

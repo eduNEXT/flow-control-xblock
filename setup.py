@@ -55,7 +55,7 @@ setup(
     ],
     entry_points={
         'xblock.v1': [
-            'check-point = flow_control:FlowCheckPointXblock',
+            'flow-control = flow_control:FlowCheckPointXblock',
         ],
     },
     package_data=package_data(
