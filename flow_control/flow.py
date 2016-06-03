@@ -1,42 +1,18 @@
-"""
-"""
-import json
+""" Flow Control Xblock allows to provide distinct
+course path according to certain conditions """
+
 import logging
 import pkg_resources
 
-from django.template.context import Context
-from django.template.loader import get_template
 from xblock.core import XBlock
 from xblock.fragment import Fragment
 from xblock.fields import Scope, Integer, String
 from xblockutils.studio_editable import StudioEditableXBlockMixin
-
-# # Not strictly xblock
-import courseware
-from django.db import transaction
-from courseware.module_render import toc_for_course, get_module_for_descriptor
-from django.contrib.auth.models import User
-# # End of Not strictly xblock
+from courseware.model_data import ScoresClient
+from opaque_keys.edx.keys import UsageKey
 
 
 logger = logging.getLogger(__name__)
-
-
-class ForceNonAtomic:
-
-    def __enter__(self):
-        self.before = transaction.get_connection().in_atomic_block
-        transaction.get_connection().in_atomic_block = False
-        return
-
-    def __exit__(self, type, value, traceback):
-        transaction.get_connection().in_atomic_block = self.before
-
-
-def load(path):
-    """Handy helper for getting resources from our kit."""
-    data = pkg_resources.resource_string(__name__, path)
-    return data.decode("utf8")
 
 
 @XBlock.needs("i18n")
@@ -45,196 +21,17 @@ class FlowControlXblock(XBlock):
     """
     """
 
-    def make_request_for_grades(self):
-        """
-        This is a helper method to create a fake request
-        """
-        hostname = self.xmodule_runtime.hostname
-
-        class req:
-            META = {}
-            user = self.user
-
-            def is_secure(self):
-                return False
-
-            def get_host(self):
-                return hostname
-
-        request = req()
-        return request
-
     def student_view(self, context=None):
-        """The main view of FlowControlXblock, displayed when viewing courses.
-
+        """
         Args:
             context: Not used for this view.
 
         Returns:
             (Fragment): The HTML Fragment for this XBlock
         """
-        self.user = self.get_user()
-
-        # # TODO: remove this note
-        # # Not strictly xblock
-        request = self.make_request_for_grades()
-        course = courseware.courses.get_course(self.course_id)
-
-        # One way
-        field_data_cache = courseware.model_data.FieldDataCache.cache_for_descriptor_descendents(
-            self.course_id, self.user, course, depth=2)
-        toc = toc_for_course(self.user, request, course,
-                             None, None, field_data_cache)
-
-        # the other way
-        with ForceNonAtomic():
-            my_grades = courseware.grades.grade(self.user, request, course)
-            progress_summary = courseware.grades.progress_summary(
-                self.user, request, course)
-
-        # # End of Not strictly xblock
-
-        # All data we intend to pass to the front end.
-        from pprint import pformat as pf
-
-        section_breakdown = my_grades.get('section_breakdown')
-        grade_breakdown = my_grades.get('grade_breakdown')
-        totaled_scores = my_grades.get('totaled_scores')
-
-        context_dict = {
-            # "toc": pf(toc),
-            "my_grades": pf(my_grades),
-            "section_breakdown": pf(section_breakdown),
-            "grade_breakdown": pf(grade_breakdown),
-            "totaled_scores": pf(totaled_scores),
-            "progress_summary": pf(progress_summary),
-            "show_staff_area": self.is_course_staff and not self.in_studio_preview,
-        }
-        template = get_template("base.html")
-
-        context = Context(context_dict)
-        fragment = Fragment(template.render(context))
-        fragment.add_javascript(load("static/js/check-point.js"))
-        fragment.initialize_js('SomeFunctionFromXblock')
+        fragment = Fragment(u"<!-- This is the FlowControlXblock -->")
 
         return fragment
-
-    def author_view(self, context=None):
-        """
-        """
-        template = get_template("author.html")
-        fragment = Fragment(template.render(context))
-        return fragment
-
-    @XBlock.json_handler
-    def control_point(self, data, suffix=''):
-        """        """
-
-        return {
-            'success': True,
-            'data': data,
-            'suffix': suffix,
-        }
-
-    @property
-    def is_course_staff(self):
-        """
-        Check whether the user has course staff permissions for this XBlock.
-
-        Returns:
-            bool
-        """
-        if hasattr(self, 'xmodule_runtime'):
-            return getattr(self.xmodule_runtime, 'user_is_staff', False)
-        else:
-            return False
-
-    @property
-    def is_beta_tester(self):
-        """
-        Check whether the user is a beta tester.
-
-        Returns:
-            bool
-        """
-        if hasattr(self, 'xmodule_runtime'):
-            return getattr(self.xmodule_runtime, 'user_is_beta_tester', False)
-        else:
-            return False
-
-    @property
-    def in_studio_preview(self):
-        """
-        Check whether we are in Studio preview mode.
-
-        Returns:
-            bool
-
-        """
-        # When we're running in Studio Preview mode, the XBlock won't provide us with a user ID.
-        # (Note that `self.xmodule_runtime` will still provide an anonymous
-        # student ID, so we can't rely on that)
-        return self.scope_ids.user_id is None
-
-    def workbench_scenarios():
-        """A canned scenario for display in the workbench.
-
-        These scenarios are only intended to be used for Workbench XBlock
-        Development.
-
-        """
-        return [
-        ]
-
-    @property
-    def _(self):
-        i18nService = self.runtime.service(self, 'i18n')
-        return i18nService.ugettext
-
-    def get_username(self, anonymous_user_id):
-        """
-        Return the username of the user associated with anonymous_user_id
-        Args:
-            anonymous_user_id (str): the anonymous user id of the user
-
-        Returns: the username if it can be identified. If the xblock service to converts to a real user
-            fails, returns None and logs the error.
-
-        """
-        if hasattr(self, "xmodule_runtime"):
-            user = self.xmodule_runtime.get_real_user(anonymous_user_id)
-            if user:
-                return user.username
-            else:
-                logger.exception(
-                    "XBlock service could not find user for anonymous_user_id '{}'".format(
-                        anonymous_user_id)
-                )
-                return None
-
-    def get_user(self):
-        """
-        Return the username of the user associated with anonymous_user_id
-        Args:
-            anonymous_user_id (str): the anonymous user id of the user
-
-        Returns: the user if it can be identified. If the xblock service to converts to a real user
-            fails, returns None and logs the error.
-
-        """
-
-        anonymous_user_id = self.xmodule_runtime.anonymous_student_id
-
-        if hasattr(self, "xmodule_runtime"):
-            user = self.xmodule_runtime.get_real_user(anonymous_user_id)
-            if user:
-                return user
-            else:
-                logger.exception(
-                    "XBlock service could not find user for anonymous_user_id '{}'".format(
-                        anonymous_user_id)
-                )
-                return None
 
 
 @XBlock.needs("i18n")
@@ -247,28 +44,55 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
         default="Flow Control"
     )
 
-    def values_genarator(self):
+    def actions_genarator(self):
         return ['No action',
                 'Redirect to tab by id, same section',
                 'Redirect to URL',
                 'Redirect using jump_to_id',
                 'Show a message']
 
-    action = String(display_name="Action",
-                    help="Select an action to apply flow control",
-                    scope=Scope.content,
-                    values_provider=values_genarator)
+    def conditions_genarator(self):
+        return ['Grade on certain problem',
+                'Grade on certain list of problems']
 
-    to = Integer(help="Number of unit to redirect",
+    def operators_genarator(self):
+        return ['equal',
+                'distinct',
+                'less than or equal to',
+                'greater than or equal to',
+                'less than',
+                'greater than']
+
+    action = String(display_name="Action",
+                    help="Select an action to apply given the condition",
+                    scope=Scope.content,
+                    values_provider=actions_genarator)
+
+    condition = String(display_name="Condition",
+                       help="Select a conditon to check",
+                       scope=Scope.content,
+                       values_provider=conditions_genarator)
+
+    operator = String(display_name="Comparison type",
+                      help="Select a operator to evaluate the condition",
+                      scope=Scope.content,
+                      values_provider=operators_genarator)
+
+    ref_value = Integer(help="Value to use for comparison",
+                        default=0,
+                        scope=Scope.content,
+                        display_name="Score percentage")
+
+    to = Integer(help="Number of unit tab to redirect",
                  default=0,
                  scope=Scope.content,
                  display_name="Tab to redirect")
 
-    target_url = String(help="Url to redirect",
+    target_url = String(help="Url to redirect, supports relative or absolute urls",
                         scope=Scope.content,
                         display_name="URL to redirect")
 
-    target_id = String(help="Unit id to redirect",
+    target_id = String(help="Unit Id to redirect",
                        scope=Scope.content,
                        display_name="Id to redirect")
 
@@ -277,27 +101,106 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
                      display_name="Message",
                      multiline_editor='html')
 
-    editable_fields = ('action', 'to', 'target_url', 'target_id', 'message')
+    problem_id = String(help="Problem Id to check the condition",
+                        scope=Scope.content,
+                        display_name="Problem Id")
+
+    list_of_problems = String(help="List of problems Ids separated by spaces to check"
+                              " the condition. Each score is calculated independently"
+                              " then an overall score is obtained",
+                              scope=Scope.content,
+                              display_name="List of problems",
+                              multiline_editor=True,
+                              resettable_editor=False)
+
+    editable_fields = ('condition',
+                       'problem_id',
+                       'list_of_problems',
+                       'operator',
+                       'ref_value',
+                       'action',
+                       'to',
+                       'target_url',
+                       'target_id',
+                       'message'
+                       )
 
     def resource_string(self, path):
         """Handy helper for getting resources from our kit."""
         data = pkg_resources.resource_string(__name__, path)
         return data.decode("utf8")
 
+    def get_location_string(self, locator):
+        course_prefix = 'course'
+        resource = 'problem'
+        course_url = self.course_id.to_deprecated_string()
+        course_url = course_url.split(course_prefix)[-1]
+
+        location_string = '{prefix}{couse_str}+{type}@{type_id}+{prefix}@{locator}'.format(
+            prefix=self.course_id.BLOCK_PREFIX,
+            couse_str=course_url,
+            type=self.course_id.BLOCK_TYPE_PREFIX,
+            type_id=resource,
+            locator=locator)
+
+        return location_string
+
+    def get_condition_status(self):
+
+        condition_reached = False
+        problems = []
+
+        if self.condition == 'Grade on certain problem':
+            usage_str = self.get_location_string(self.problem_id)
+            condition_reached = self.condition_problem(usage_str)
+
+        if self.condition == 'Grade on certain list of problems':
+            problems = self.list_of_problems.split()
+            condition_reached = self.condition_on_problem_list(problems)
+
+        return condition_reached
+
     def student_view(self, context=None):
 
+        fragment = Fragment(u"<!-- This is the FlowCheckPointXblock -->")
+        fragment.add_javascript(
+            self.resource_string("static/js/injection.js"))
+
+        # helper variables
+        in_studio_runtime = hasattr(self.xmodule_runtime, 'is_author_mode')
         index_base = 1
         default_tab = 'tab_{}'.format(self.to - index_base)
-        fragment = Fragment(u"<!-- This is the FlowCheckPointXblock -->")
-        fragment.add_javascript(load("static/js/injection.js"))
+
         fragment.initialize_js(
-            'FlowControlGoto', json_args={"display_name": self.display_name,
-                                          "default": default_tab,
-                                          "default_tab_id": self.to,
-                                          "action": self.action,
-                                          "target_url": self.target_url,
-                                          "target_id": self.target_id,
-                                          "message": self.message})
+            'FlowControlGoto',
+            json_args={"display_name": self.display_name,
+                       "default": default_tab,
+                       "default_tab_id": self.to,
+                       "action": self.action,
+                       "target_url": self.target_url,
+                       "target_id": self.target_id,
+                       "message": self.message,
+                       "in_studio_runtime": in_studio_runtime})
+
+        return fragment
+
+    @XBlock.json_handler
+    def condition_status_handler(self, data, suffix=''):
+        """  Returns the actual condition state  """
+
+        return {
+            'success': True,
+            'status': self.get_condition_status()
+        }
+
+    def author_view(self, context=None):
+
+        # creating xblock fragment
+        # TO-DO display for studio with setting resume
+        fragment = Fragment(u"<!-- This is the studio -->")
+        fragment.add_javascript(
+            self.resource_string("static/js/injection.js"))
+        fragment.initialize_js('StudioFlowControl')
 
         return fragment
 
@@ -306,17 +209,56 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
         fragment = super(FlowCheckPointXblock,
                          self).studio_view(context=context)
 
-        fragment.add_javascript(load("static/js/injection.js"))  # We could also move this function to a different file
+        # We could also move this function to a different file
+        fragment.add_javascript(self.resource_string("static/js/injection.js"))
         fragment.initialize_js('EditFlowControl')
 
         return fragment
 
-    @XBlock.json_handler
-    def control_point(self, data, suffix=''):
-        """        """
+    def compare_scores(self, correct, total):
+        if total:
+            # getting percentage score for that section
+            percentage = (correct / total) * 100
 
-        return {
-            'success': True,
-            'data': data,
-            'suffix': suffix,
-        }
+            if self.operator == 'equal':
+                return percentage == self.ref_value
+            if self.operator == 'distinct':
+                return percentage != self.ref_value
+            if self.operator == 'less than or equal to':
+                return percentage <= self.ref_value
+            if self.operator == 'greater than or equal to':
+                return percentage >= self.ref_value
+            if self.operator == 'less than':
+                return percentage < self.ref_value
+            if self.operator == 'greater than':
+                return percentage > self.ref_value
+
+        return False
+
+    def condition_problem(self, location_str):
+
+        usage_key = UsageKey.from_string(location_str)
+        user_id = self.xmodule_runtime.user_id
+
+        scores_client = ScoresClient(self.course_id, user_id)
+        scores_client.fetch_scores([usage_key])
+        score = scores_client.get(usage_key)
+
+        return self.compare_scores(score.correct, score.total)
+
+    def condition_on_problem_list(self, problems):
+        user_id = self.xmodule_runtime.user_id
+        scores_client = ScoresClient(self.course_id, user_id)
+        total = 0
+        correct = 0
+
+        for problem in problems:
+            location_str = self.get_location_string(problem)
+            usage_key = UsageKey.from_string(location_str)
+            scores_client.fetch_scores([usage_key])
+            score = scores_client.get(usage_key)
+            if score.total:
+                total += score.total
+                correct += score.correct
+
+        return self.compare_scores(correct, total)

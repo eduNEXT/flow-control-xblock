@@ -1,52 +1,100 @@
 
 var settings = {
-  time_to_check: 1,
-  tab_togo: null,
-  default_tab_id:null,
-  default_action: 1,
-  target_url:null,
-  target_id:null,
-  lms_base_jump_url:"../../../jump_to_id/",
-  message:null
+  timeToCheck: 1,
+  tabTogo: null,
+  defaulTabId:null,
+  defaultAction: 1,
+  targetUrl:null,
+  targetId:null,
+  lmsBaseJumpUrl:"../../../jump_to_id/",
+  message:null,
+  conditionReached: null,
+  inStudioRuntime: false
 };
 
 var actions = {
-  no_act: "No action",
-  redirect_tab: "Redirect to tab by id, same section",
-  redirect_url: "Redirect to URL",
-  redirect_jump: "Redirect using jump_to_id",
+  noAct: "No action",
+  redirectTab: "Redirect to tab by id, same section",
+  redirectUrl: "Redirect to URL",
+  redirectJump: "Redirect using jump_to_id",
   show_message: "Show a message"
+};
+
+var conditions = {
+  gradeOnProblem: "Grade on certain problem",
+  gradeOnSection: "Grade on certain list of problems",
+  setConditionStatus: function (data){
+    settings.conditionReached = data.status;
+  }
 };
 
 var viewblocks = {
   seqContent: $("#seq_content"),
   hideNotAllowedOption: function (){
-    $("#settings-tab > ul > li").filter('[data-field-name!="action"]').hide()
+    $("#settings-tab > ul > li").hide();
+    $("#settings-tab > ul > li").filter('[data-field-name="condition"]').show();
+    $("#settings-tab > ul > li").filter('[data-field-name="action"]').show();
+    $("#settings-tab > ul > li").filter('[data-field-name="operator"]').show();
+    $("#settings-tab > ul > li").filter('[data-field-name="ref_value"]').show();
 
     switch ($("#xb-field-edit-action").val()){
 
-      case actions["redirect_tab"]:
-        $("#settings-tab > ul > li").filter('[data-field-name="to"]').show()
+      case actions["redirectTab"]:
+        $("#settings-tab > ul > li").filter('[data-field-name="to"]').show();
         break;
-      case actions["redirect_url"]:
-        $("#settings-tab > ul > li").filter('[data-field-name="target_url"]').show()
+      case actions["redirectUrl"]:
+        $("#settings-tab > ul > li").filter('[data-field-name="target_url"]').show();
         break;
-      case actions["redirect_jump"]:
-        $("#settings-tab > ul > li").filter('[data-field-name="target_id"]').show()
+      case actions["redirectJump"]:
+        $("#settings-tab > ul > li").filter('[data-field-name="target_id"]').show();
         break;
       case actions["show_message"]:
-        $("#settings-tab > ul > li").filter('[data-field-name="message"]').show()
+        $("#settings-tab > ul > li").filter('[data-field-name="message"]').show();
         break;
 
     }
 
+    switch ($("#xb-field-edit-condition").val()){
+
+      case conditions["gradeOnProblem"]:
+        $("#settings-tab > ul > li").filter('[data-field-name="problem_id"]').show();
+        break;
+      case conditions["gradeOnSection"]:
+        $("#settings-tab > ul > li").filter('[data-field-name="list_of_problems"]').show();
+        break;
+
+    }
+  },
+  applyFlowControl: function(condition){
+    if (condition){
+      switch (settings.defaultAction){
+        case actions.noAct:
+          break;
+        case actions.redirectTab:
+          viewblocks.seqContent.empty();
+          window.flowControlTimeoutID = window.setTimeout(redirectToTab,
+            settings.timeToCheck,
+            settings.tabTogo);
+          break;
+        case actions.redirectUrl:
+          viewblocks.seqContent.empty();
+          location.href = settings.targetUrl;
+          break;
+        case actions.redirectJump:
+          viewblocks.seqContent.empty();
+          location.href = settings.targetId;
+          break;
+        case actions.show_message:
+          viewblocks.seqContent.html(settings.message);
+          break;
+      }
+    }
   }
 };
 
 var getActiveTab = function() {
 
   // Find the ID of the active vertical
-  // var activeVerticalID = $(element).closest(".xblock-student_view-vertical").data("usage-id");
   var activeVerticalID = $("#course-content #seq_content .xblock-student_view-vertical").data("usage-id");
 
   // Get the tab from the sequence that points to this vertical
@@ -79,8 +127,6 @@ var redirectToTab = function(arg) {
       last_tab_index = allTabs.length - 1,
       last_tab = "tab_" + last_tab_index;
 
-  console.log("tic " + arg + " " + currentID);
-
   if (currentID === arg){
     window.clearTimeout(window.flowControlTimeoutID);
 
@@ -89,69 +135,53 @@ var redirectToTab = function(arg) {
   }
   else {
     var whereTo = null;
-    if (settings["default_tab_id"] > last_tab_index) {
+    if (settings["defaulTabId"] > last_tab_index) {
       whereTo = last_tab;
     }
-    if (settings["default_tab_id"] < first_tab_index) {
+    if (settings["defaulTabId"] < first_tab_index) {
       whereTo = first_tab;
     }
-    if (first_tab_index <= settings["default_tab_id"] && settings["default_tab_id"] <= last_tab_index) {
+    if (first_tab_index <= settings["defaulTabId"] && settings["defaulTabId"] <= last_tab_index) {
       whereTo = arg;
     }
 
     execControl(whereTo);
-    window.flowControlTimeoutID = window.setTimeout(redirectToTab, settings["time_to_check"], whereTo);
+    window.flowControlTimeoutID = window.setTimeout(redirectToTab, settings["timeToCheck"], whereTo);
 
   }
 }
 
 function FlowControlGoto(runtime, element, options) {
 
+  // Getting settings varibales to apply flow control
+  settings.tabTogo = options.default;
+  settings.defaultAction = options.action;
+  settings.targetUrl = options.target_url;
+  settings.targetId = settings.lmsBaseJumpUrl + options.target_id;
+  settings.defaulTabId = options.default_tab_id;
+  settings.message = options.message;
+  settings.inStudioRuntime = options.in_studio_runtime;
 
+  var handlerUrl = runtime.handlerUrl(element, 'condition_status_handler');
 
-  settings["tab_togo"] = options.default
-  settings["default_action"] = options.action;
-  settings["target_url"] = options.target_url;
-  settings["target_id"] = settings["lms_base_jump_url"] + options.target_id;
-  settings["default_tab_id"] = options.default_tab_id;
-  settings["message"] = options.message;
-  //var targetId = options.target;
+  if (!settings.inStudioRuntime){
+    $.ajax({
+      type: "POST",
+      url: handlerUrl,
+      data: JSON.stringify({"": ""}),
+      success: conditions.setConditionStatus,
+      async: false,
+    });
 
-  //Getting xblock runtime environment element
-  var runtime = $("[data-block-type='check-point']");
-
-  //Only apply flow control actions on LMS runtime
-  if (runtime.data("runtime-class") === "LmsRuntime") {
-
-    switch (settings["default_action"]){
-      case actions["no_act"]:
-        break;
-      case actions["redirect_tab"]:
-        viewblocks["seqContent"].empty();
-        window.flowControlTimeoutID = window.setTimeout(redirectToTab,
-                                        settings["time_to_check"],
-                                        settings["tab_togo"]);
-        break;
-      case actions["redirect_url"]:
-        viewblocks["seqContent"].empty();
-        location.href = settings["target_url"];
-        break;
-      case actions["redirect_jump"]:
-        viewblocks["seqContent"].empty();
-        location.href = settings["target_id"];
-        break;
-      case actions["show_message"]:
-        viewblocks["seqContent"].html(settings["message"]);
-        break;
+    if (settings.conditionReached){
+      viewblocks.applyFlowControl(settings.conditionReached);
     }
   }
-
-  if (runtime.data("runtime-class") === "PreviewRuntime") {
-
+  else{
     $("header.xblock-header-check-point li.action-item.action-visibility").hide();
     $("header.xblock-header-check-point li.action-item.action-duplicate").hide();
-
   }
+
 }
 
 function EditFlowControl(runtime, element) {
@@ -161,7 +191,16 @@ function EditFlowControl(runtime, element) {
 
     viewblocks.hideNotAllowedOption();
 
-    $("#xb-field-edit-action").on("change",function(){
+    $("#xb-field-edit-action, #xb-field-edit-condition").on("change",function(){
           viewblocks.hideNotAllowedOption();
     });
+
+}
+
+function StudioFlowControl(runtime, element) {
+
+  $("header.xblock-header-check-point li.action-item.action-visibility").hide();
+  $("header.xblock-header-check-point li.action-item.action-duplicate").hide();
+
+
 }
