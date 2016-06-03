@@ -68,7 +68,7 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
 
     def conditions_genarator(self):
         return ['Grade on certain problem',
-                'Grade on certain section']
+                'Grade on certain list of problems']
 
     def operators_genarator(self):
         return ['equal',
@@ -120,13 +120,15 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
                         scope=Scope.content,
                         display_name="Problem Id")
 
-    section_id = String(help="Section Id that to apply condition",
-                        scope=Scope.content,
-                        display_name="Section Id")
+    list_of_problems = String(help="List of problems Ids separated by space to apply condition",
+                              scope=Scope.content,
+                              display_name="List of problems",
+                              multiline_editor=True,
+                              resettable_editor=False)
 
     editable_fields = ('condition',
                        'problem_id',
-                       'section_id',
+                       'list_of_problems',
                        'operator',
                        'ref_value',
                        'action',
@@ -146,8 +148,6 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
         course_url = self.course_id.to_deprecated_string()
         course_url = course_url.split(course_prefix)[-1]
 
-        # "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_ac391cde8a91"
-        #  block-v1:UniversityEduNext+CS108+2016_5+type@vertical+block@3697c51a292240e09104e05935bc7e8c
         location_string = '{prefix}{couse_str}+{type}@{type_id}+{prefix}@{locator}'.format(
             prefix=self.course_id.BLOCK_PREFIX,
             couse_str=course_url,
@@ -158,26 +158,17 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
         return location_string
 
     def get_condition_status(self):
-        print "get_condition_status <------------------------------------------------"
-        print "\n" * 3
-        resource = None
+        resource = 'problem'
         condition_reached = None
+        problems = []
 
         if self.condition == 'Grade on certain problem':
-            resource = 'problem'
             usage_str = self.get_location_string(resource, self.problem_id)
             condition_reached = self.condition_problem(usage_str)
 
-        if self.condition == 'Grade on certain section':
-            # que hacemos cuando es mas que un vertical.
-            # ej sequential o chapter
-            resource = 'vertical'
-            usage_str = self.get_location_string(resource, self.section_id)
-
-            print "\n" * 10
-            print usage_str
-
-            condition_reached = self.condition_subsection(usage_str)
+        if self.condition == 'Grade on certain list of problems':
+            problems = self.list_of_problems.split()
+            condition_reached = self.condition_subsection(problems)
 
         return condition_reached
 
@@ -264,76 +255,38 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
 
         return False
 
+    def condition_subsection(self, problems):
+        user_id = self.xmodule_runtime.user_id
+        scores_client = courseware.model_data.ScoresClient(
+            self.course_id, user_id)
+        total = 0
+        correct = 0
+        resource = 'problem'
 
-    def condition_subsection(self):
+        for problem in problems:
+            location_str = self.get_location_string(resource, problem)
+            usage_key = UsageKey.from_string(location_str)
+            scores_client.fetch_scores([usage_key])
+            score = scores_client.get(usage_key)
+            if score.total:
+                total += score.total
+                correct += score.correct
 
-        # url_name = "c23b546c327a48fab9a6d352a64550af"  # xblock testing (section) -> chapter
-        # url_name = "workflow"                          # edx_exams (subseccion)   -> sequential
-        # url_name = "42cd641b48ea4326b91765a9d60d3272"  # all the evil (subsection)
-        # block    = "vertical_ac391cde8a91"             # limited checks
-        # (vertical)
+        if total:
+            # getting percentage score for that section
+            percentage = (correct / total) * 100
 
-        # location_str = "block-v1:edX+DemoX+Demo_Course+type@chapter+block@c23b546c327a48fab9a6d352a64550af"
-        # location_str = "block-v1:edX+DemoX+Demo_Course+type@sequential+block@workflow"
-        location_str = "block-v1:edX+DemoX+Demo_Course+type@vertical+block@vertical_ac391cde8a91"
-        usage_key = UsageKey.from_string(location_str)
-        summary = self.get_progress_summary()
+            if self.operator == 'equal':
+                return percentage == self.ref_value
+            if self.operator == 'distinct':
+                return percentage != self.ref_value
+            if self.operator == 'less than or equal to':
+                return percentage <= self.ref_value
+            if self.operator == 'greater than or equal to':
+                return percentage >= self.ref_value
+            if self.operator == 'less than':
+                return percentage < self.ref_value
+            if self.operator == 'greater than':
+                return percentage > self.ref_value
 
-        (earned, possible) = summary.score_for_module(usage_key)
-        return earned == possible
-
-    #################################
-    #          EXPERIMENTAL         #
-    #################################
-
-    def get_progress_summary(self):
-        user = self.get_user()
-        course = courseware.courses.get_course(self.course_id)
-
-        with ForceNonAtomic():
-            progress_summary = courseware.grades._progress_summary(
-                user,
-                self.make_request_for_grades(user),
-                course,
-                None,
-                None,
-            )
-        return progress_summary
-
-    def get_user(self):
-        """
-        Return the user of the user associated with anonymous_user_id
-
-        Returns: the user if it can be identified. If the xblock service to converts to a real user
-            fails, returns None and logs the error.
-        """
-        anonymous_user_id = self.xmodule_runtime.anonymous_student_id
-        user = self.xmodule_runtime.get_real_user(anonymous_user_id)
-        if user:
-            return user
-        else:
-            logger.exception(
-                "XBlock service could not find user for anonymous_user_id '{}'".format(
-                    anonymous_user_id)
-            )
-            return None
-
-    def make_request_for_grades(self, user):
-        """
-        This is a helper method to create a request object which can be used to
-        call courseware.grade functions
-        """
-        hostname = self.xmodule_runtime.hostname
-        user_obj = user
-
-        class _req:
-            META = {}
-            user = user_obj
-
-            def is_secure(self):
-                return False
-
-            def get_host(self):
-                return hostname
-
-        return _req()
+        return False

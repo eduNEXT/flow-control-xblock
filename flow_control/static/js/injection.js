@@ -23,7 +23,7 @@ var actions = {
 
 var conditions = {
   gradeOnProblem: "Grade on certain problem",
-  gradeOnSection: "Grade on certain section",
+  gradeOnSection: "Grade on certain list of problems",
   setConditionStatus: function (data){
     settings.conditionReached = data.status;
   }
@@ -61,7 +61,7 @@ var viewblocks = {
         $("#settings-tab > ul > li").filter('[data-field-name="problem_id"]').show();
         break;
       case conditions["gradeOnSection"]:
-        $("#settings-tab > ul > li").filter('[data-field-name="section_id"]').show();
+        $("#settings-tab > ul > li").filter('[data-field-name="list_of_problems"]').show();
         break;
 
     }
@@ -168,7 +168,6 @@ function FlowControlGoto(runtime, element, options) {
   var handlerUrl = runtime.handlerUrl(element, 'condition_status_handler');
 
   if (!settings.inStudioRuntime){
-    console.debug("en lms ");
     $.ajax({
       type: "POST",
       url: handlerUrl,
@@ -183,7 +182,6 @@ function FlowControlGoto(runtime, element, options) {
     }
   }
   else{
-    console.debug("no no no, en stuido no ");
     $("header.xblock-header-check-point li.action-item.action-visibility").hide();
     $("header.xblock-header-check-point li.action-item.action-duplicate").hide();
   }
