@@ -1,5 +1,5 @@
 """ Flow Control Xblock allows to provide distinct
-path courses according to certain conditions """
+course path according to certain conditions """
 
 import logging
 import pkg_resources
@@ -10,24 +10,12 @@ from xblock.fields import Scope, Integer, String
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 
 # # Not strictly xblock
-import courseware
-from django.db import transaction
+from courseware.model_data import ScoresClient
 from opaque_keys.edx.keys import UsageKey
 # # End of Not strictly xblock
 
 
 logger = logging.getLogger(__name__)
-
-
-class ForceNonAtomic:
-
-    def __enter__(self):
-        self.before = transaction.get_connection().in_atomic_block
-        transaction.get_connection().in_atomic_block = False
-        return
-
-    def __exit__(self, type, value, traceback):
-        transaction.get_connection().in_atomic_block = self.before
 
 
 @XBlock.needs("i18n")
@@ -143,8 +131,9 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
         data = pkg_resources.resource_string(__name__, path)
         return data.decode("utf8")
 
-    def get_location_string(self, resource, locator):
+    def get_location_string(self, locator):
         course_prefix = 'course'
+        resource = 'problem'
         course_url = self.course_id.to_deprecated_string()
         course_url = course_url.split(course_prefix)[-1]
 
@@ -158,12 +147,12 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
         return location_string
 
     def get_condition_status(self):
-        resource = 'problem'
-        condition_reached = None
+
+        condition_reached = False
         problems = []
 
         if self.condition == 'Grade on certain problem':
-            usage_str = self.get_location_string(resource, self.problem_id)
+            usage_str = self.get_location_string(self.problem_id)
             condition_reached = self.condition_problem(usage_str)
 
         if self.condition == 'Grade on certain list of problems':
@@ -227,51 +216,7 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
 
         return fragment
 
-    def condition_problem(self, location_str):
-
-        usage_key = UsageKey.from_string(location_str)
-        user_id = self.xmodule_runtime.user_id
-
-        scores_client = courseware.model_data.ScoresClient(
-            self.course_id, user_id)
-        scores_client.fetch_scores([usage_key])
-        score = scores_client.get(usage_key)
-        if score.total:
-            # getting percentage score for that problem
-            percentage = (score.correct / score.total) * 100
-
-            if self.operator == 'equal':
-                return percentage == self.ref_value
-            if self.operator == 'distinct':
-                return percentage != self.ref_value
-            if self.operator == 'less than or equal to':
-                return percentage <= self.ref_value
-            if self.operator == 'greater than or equal to':
-                return percentage >= self.ref_value
-            if self.operator == 'less than':
-                return percentage < self.ref_value
-            if self.operator == 'greater than':
-                return percentage > self.ref_value
-
-        return False
-
-    def condition_subsection(self, problems):
-        user_id = self.xmodule_runtime.user_id
-        scores_client = courseware.model_data.ScoresClient(
-            self.course_id, user_id)
-        total = 0
-        correct = 0
-        resource = 'problem'
-
-        for problem in problems:
-            location_str = self.get_location_string(resource, problem)
-            usage_key = UsageKey.from_string(location_str)
-            scores_client.fetch_scores([usage_key])
-            score = scores_client.get(usage_key)
-            if score.total:
-                total += score.total
-                correct += score.correct
-
+    def compare_scores(self, correct, total):
         if total:
             # getting percentage score for that section
             percentage = (correct / total) * 100
@@ -290,3 +235,31 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
                 return percentage > self.ref_value
 
         return False
+
+    def condition_problem(self, location_str):
+
+        usage_key = UsageKey.from_string(location_str)
+        user_id = self.xmodule_runtime.user_id
+
+        scores_client = ScoresClient(self.course_id, user_id)
+        scores_client.fetch_scores([usage_key])
+        score = scores_client.get(usage_key)
+
+        return self.compare_scores(score.correct, score.total)
+
+    def condition_subsection(self, problems):
+        user_id = self.xmodule_runtime.user_id
+        scores_client = ScoresClient(self.course_id, user_id)
+        total = 0
+        correct = 0
+
+        for problem in problems:
+            location_str = self.get_location_string(problem)
+            usage_key = UsageKey.from_string(location_str)
+            scores_client.fetch_scores([usage_key])
+            score = scores_client.get(usage_key)
+            if score.total:
+                total += score.total
+                correct += score.correct
+
+        return self.compare_scores(correct, total)

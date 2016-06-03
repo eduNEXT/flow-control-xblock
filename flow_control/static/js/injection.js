@@ -9,8 +9,7 @@ var settings = {
   lmsBaseJumpUrl:"../../../jump_to_id/",
   message:null,
   conditionReached: null,
-  inStudioRuntime: false,
-  realTimeCondition: false,
+  inStudioRuntime: false
 };
 
 var actions = {
@@ -65,7 +64,6 @@ var viewblocks = {
         break;
 
     }
-
   },
   applyFlowControl: function(condition){
     if (condition){
@@ -97,7 +95,6 @@ var viewblocks = {
 var getActiveTab = function() {
 
   // Find the ID of the active vertical
-  // var activeVerticalID = $(element).closest(".xblock-student_view-vertical").data("usage-id");
   var activeVerticalID = $("#course-content #seq_content .xblock-student_view-vertical").data("usage-id");
 
   // Get the tab from the sequence that points to this vertical
@@ -157,7 +154,7 @@ var redirectToTab = function(arg) {
 function FlowControlGoto(runtime, element, options) {
 
   // Getting settings varibales to apply flow control
-  settings.tabTogo = options.default
+  settings.tabTogo = options.default;
   settings.defaultAction = options.action;
   settings.targetUrl = options.target_url;
   settings.targetId = settings.lmsBaseJumpUrl + options.target_id;
@@ -177,7 +174,6 @@ function FlowControlGoto(runtime, element, options) {
     });
 
     if (settings.conditionReached){
-      console.debug("condition reached");
       viewblocks.applyFlowControl(settings.conditionReached);
     }
   }
