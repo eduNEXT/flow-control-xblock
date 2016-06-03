@@ -25,7 +25,7 @@ var conditions = {
   gradeOnProblem: "Grade on certain problem",
   gradeOnSection: "Grade on certain section",
   setConditionStatus: function (data){
-    settings.realTimeCondition = data.status;
+    settings.conditionReached = data.status;
   }
 };
 
@@ -68,7 +68,6 @@ var viewblocks = {
 
   },
   applyFlowControl: function(condition){
-    console.debug("applyFlowControl");
     if (condition){
       switch (settings.defaultAction){
         case actions.noAct:
@@ -164,26 +163,30 @@ function FlowControlGoto(runtime, element, options) {
   settings.targetId = settings.lmsBaseJumpUrl + options.target_id;
   settings.defaulTabId = options.default_tab_id;
   settings.message = options.message;
-  settings.conditionReached = options.condition_reached;
   settings.inStudioRuntime = options.in_studio_runtime;
 
   var handlerUrl = runtime.handlerUrl(element, 'condition_status_handler');
 
-  $.ajax({
-    type: "POST",
-    url: handlerUrl,
-    data: JSON.stringify({"": ""}),
-    success: conditions.setConditionStatus,
-    async: false,
-  });
+  if (!settings.inStudioRuntime){
+    console.debug("en lms ");
+    $.ajax({
+      type: "POST",
+      url: handlerUrl,
+      data: JSON.stringify({"": ""}),
+      success: conditions.setConditionStatus,
+      async: false,
+    });
 
-  if (settings.conditionReached != settings.realTimeCondition){
-    console.debug("condition changed");
-    viewblocks.applyFlowControl(settings["realTimeCondition"]);
-  }else{
-    viewblocks.applyFlowControl(settings["conditionReached"]);
+    if (settings.conditionReached){
+      console.debug("condition reached");
+      viewblocks.applyFlowControl(settings.conditionReached);
+    }
   }
-
+  else{
+    console.debug("no no no, en stuido no ");
+    $("header.xblock-header-check-point li.action-item.action-visibility").hide();
+    $("header.xblock-header-check-point li.action-item.action-duplicate").hide();
+  }
 
 }
 
