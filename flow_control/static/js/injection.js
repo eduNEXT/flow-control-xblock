@@ -178,8 +178,8 @@ function FlowControlGoto(runtime, element, options) {
     }
   }
   else{
-    $("header.xblock-header-check-point li.action-item.action-visibility").hide();
-    $("header.xblock-header-check-point li.action-item.action-duplicate").hide();
+    $("header.xblock-header-flow-control li.action-item.action-visibility").hide();
+    $("header.xblock-header-flow-control li.action-item.action-duplicate").hide();
   }
 
 }
@@ -199,8 +199,8 @@ function EditFlowControl(runtime, element) {
 
 function StudioFlowControl(runtime, element) {
 
-  $("header.xblock-header-check-point li.action-item.action-visibility").hide();
-  $("header.xblock-header-check-point li.action-item.action-duplicate").hide();
+  $("header.xblock-header-flow-control li.action-item.action-visibility").hide();
+  $("header.xblock-header-flow-control li.action-item.action-duplicate").hide();
 
 
 }
