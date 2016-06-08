@@ -6,6 +6,8 @@ var specMessages = {
   initEditFlowControl: 'It should initialize Xblock correctly on studio edit view and set on change event listener',
   initStudioFlowControl: 'It should initialize Xblock correctly on studio view and hide ui elements',
   viewblocks: 'Variable viewblocks.seqContent should be #seq_content',
+  setCondition: 'It should set the current condition status '
+
 };
 
 describe(specMessages.suiteTitle, function() {
@@ -29,7 +31,7 @@ describe(specMessages.suiteTitle, function() {
             data = {'success': true, 'status': true};
             request.success(data);
         });
-        spyOn(viewblocks, 'applyFlowControl')
+        spyOn(viewblocks, 'applyFlowControl');
         runtime.handlerUrl = jasmine.createSpy();
         FlowControlGoto(runtime, element, options);
 
@@ -47,10 +49,10 @@ describe(specMessages.suiteTitle, function() {
     it(specMessages.initFlowControlConditionNotReached, function() {
 
         spyOn($, 'ajax').and.callFake(function(request) {
-            data = {'success': true, 'status': false};
+            var data = {'success': true, 'status': false};
             request.success(data);
         });
-        spyOn(viewblocks, 'applyFlowControl')
+        spyOn(viewblocks, 'applyFlowControl');
         runtime.handlerUrl = jasmine.createSpy();
         FlowControlGoto(runtime, element, options);
 
@@ -68,11 +70,14 @@ describe(specMessages.suiteTitle, function() {
     it(specMessages.initFlowControlOnStudio, function() {
 
         options.in_studio_runtime = true;
-        spyOn($.fn, 'hide');
+        var hideSpy = spyOn($.fn, 'hide');
         runtime.handlerUrl = jasmine.createSpy();
         FlowControlGoto(runtime, element, options);
+        uiElementsHided = hideSpy.calls.all();
 
-        expect($.fn.hide).toHaveBeenCalledTimes(2);
+        expect(uiElementsHided[0].object.selector).toBe(uiSelectors.visibility);
+        expect(uiElementsHided[1].object.selector).toBe(uiSelectors.duplicate);
+        expect(hideSpy).toHaveBeenCalledTimes(2);
         expect(settings.tabTogo).toBe(options.default);
         expect(settings.defaultAction).toBe(options.action);
         expect(settings.targetUrl).toBe(options.target_url);
@@ -99,10 +104,13 @@ describe(specMessages.suiteTitle, function() {
 
     it(specMessages.initStudioFlowControl, function() {
 
-        var tab = spyOn($.fn, 'hide');
+        var hideSpy = spyOn($.fn, 'hide');
         StudioFlowControl(runtime,element);
-        //console.debug(tab.mostRecentCall.object.selector);
-        expect($.fn.hide).toHaveBeenCalledTimes(2);
+        uiElementsHided = hideSpy.calls.all();
+
+        expect(uiElementsHided[0].object.selector).toBe(uiSelectors.visibility);
+        expect(uiElementsHided[1].object.selector).toBe(uiSelectors.duplicate);
+        expect(hideSpy).toHaveBeenCalledTimes(2);
 
     });
 
@@ -111,4 +119,14 @@ describe(specMessages.suiteTitle, function() {
         expect(viewblocks.seqContent).toEqual($("#seq_content"));
 
     });
+
+    it(specMessages.setCondition, function() {
+
+        var data = {'success': true, 'status': false};
+        conditions.setConditionStatus(data);
+
+        expect(settings.conditionReached).toBe(data.status);
+
+    });
+
 });
