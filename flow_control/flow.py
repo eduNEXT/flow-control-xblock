@@ -63,16 +63,19 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
     action = String(display_name="Action",
                     help="Select an action to apply given the condition",
                     scope=Scope.content,
+                    default="No action",
                     values_provider=_actions_generator)
 
     condition = String(display_name="Condition",
                        help="Select a conditon to check",
                        scope=Scope.content,
+                       default='Grade on certain problem',
                        values_provider=_conditions_generator)
 
     operator = String(display_name="Comparison type",
                       help="Select a operator to evaluate the condition",
                       scope=Scope.content,
+                      default='equal',
                       values_provider=_operators_generator)
 
     ref_value = Integer(help="Value to use for comparison",
@@ -148,7 +151,8 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
         problems = []
 
         if self.condition == 'Grade on certain problem':
-            usage_str = self.get_location_string(self.problem_id)
+            problems = self.problem_id.split()
+            usage_str = self.get_location_string(problems[0])
             condition_reached = self.condition_problem(usage_str)
 
         if self.condition == 'Grade on certain list of problems':
