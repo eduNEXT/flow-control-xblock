@@ -48,7 +48,7 @@ var viewblocks = {
     switch ($(uiSelectors.action).val()){
 
       case actions["redirectTab"]:
-        $(uiSelectors.settingsFields).filter('[data-field-name="to"]').show();
+        $(uiSelectors.settingsFields).filter('[data-field-name="tab_to"]').show();
         break;
       case actions["redirectUrl"]:
         $(uiSelectors.settingsFields).filter('[data-field-name="target_url"]').show();
