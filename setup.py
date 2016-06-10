@@ -20,6 +20,10 @@
 
 # Imports ###########################################################
 
+"""
+FlowControl Xblock setup file
+"""
+
 import os
 from setuptools import setup
 

@@ -28,39 +28,47 @@ var conditions = {
   }
 };
 
+var uiSelectors = {
+  settingsFields: '#settings-tab > ul > li',
+  visibility: 'header.xblock-header-flow-control li.action-item.action-visibility',
+  duplicate: 'header.xblock-header-flow-control li.action-item.action-duplicate',
+  action: '#xb-field-edit-action',
+  condition: '#xb-field-edit-condition'
+}
+
 var viewblocks = {
   seqContent: $("#seq_content"),
   hideNotAllowedOption: function (){
-    $("#settings-tab > ul > li").hide();
-    $("#settings-tab > ul > li").filter('[data-field-name="condition"]').show();
-    $("#settings-tab > ul > li").filter('[data-field-name="action"]').show();
-    $("#settings-tab > ul > li").filter('[data-field-name="operator"]').show();
-    $("#settings-tab > ul > li").filter('[data-field-name="ref_value"]').show();
+    $(uiSelectors.settingsFields).hide();
+    $(uiSelectors.settingsFields).filter('[data-field-name="condition"]').show();
+    $(uiSelectors.settingsFields).filter('[data-field-name="action"]').show();
+    $(uiSelectors.settingsFields).filter('[data-field-name="operator"]').show();
+    $(uiSelectors.settingsFields).filter('[data-field-name="ref_value"]').show();
 
-    switch ($("#xb-field-edit-action").val()){
+    switch ($(uiSelectors.action).val()){
 
       case actions["redirectTab"]:
-        $("#settings-tab > ul > li").filter('[data-field-name="to"]').show();
+        $(uiSelectors.settingsFields).filter('[data-field-name="tab_to"]').show();
         break;
       case actions["redirectUrl"]:
-        $("#settings-tab > ul > li").filter('[data-field-name="target_url"]').show();
+        $(uiSelectors.settingsFields).filter('[data-field-name="target_url"]').show();
         break;
       case actions["redirectJump"]:
-        $("#settings-tab > ul > li").filter('[data-field-name="target_id"]').show();
+        $(uiSelectors.settingsFields).filter('[data-field-name="target_id"]').show();
         break;
       case actions["show_message"]:
-        $("#settings-tab > ul > li").filter('[data-field-name="message"]').show();
+        $(uiSelectors.settingsFields).filter('[data-field-name="message"]').show();
         break;
 
     }
 
-    switch ($("#xb-field-edit-condition").val()){
+    switch ($(uiSelectors.condition).val()){
 
       case conditions["gradeOnProblem"]:
-        $("#settings-tab > ul > li").filter('[data-field-name="problem_id"]').show();
+        $(uiSelectors.settingsFields).filter('[data-field-name="problem_id"]').show();
         break;
       case conditions["gradeOnSection"]:
-        $("#settings-tab > ul > li").filter('[data-field-name="list_of_problems"]').show();
+        $(uiSelectors.settingsFields).filter('[data-field-name="list_of_problems"]').show();
         break;
 
     }
@@ -178,8 +186,8 @@ function FlowControlGoto(runtime, element, options) {
     }
   }
   else{
-    $("header.xblock-header-check-point li.action-item.action-visibility").hide();
-    $("header.xblock-header-check-point li.action-item.action-duplicate").hide();
+    $(uiSelectors.visibility).hide();
+    $(uiSelectors.duplicate).hide();
   }
 
 }
@@ -199,8 +207,8 @@ function EditFlowControl(runtime, element) {
 
 function StudioFlowControl(runtime, element) {
 
-  $("header.xblock-header-check-point li.action-item.action-visibility").hide();
-  $("header.xblock-header-check-point li.action-item.action-duplicate").hide();
+  $(uiSelectors.visibility).hide();
+  $(uiSelectors.duplicate).hide();
 
 
 }

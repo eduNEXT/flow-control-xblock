@@ -1,3 +1,4 @@
 """
+This is the FlowControl Xblock package
 """
-from .flow import FlowControlXblock, FlowCheckPointXblock
+from .flow import FlowCheckPointXblock
