@@ -15,7 +15,7 @@ $ pip install -r requirements.txt
 
 Features include:
 
-* **Studio editable settings:** allows to select a custom actions or
+* **Studio editable settings:** allows to select custom actions or
   conditions to apply flow control on LMS contents.
 * **Custom operators:** allows to select a custom operator
   to check the selected condition.
