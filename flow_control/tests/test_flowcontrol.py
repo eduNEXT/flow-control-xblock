@@ -129,3 +129,39 @@ class TestBuilderBlocks(unittest.TestCase):
         # asserts
         problems = self.block.list_of_problems.split()
         self.block.condition_on_problem_list.assert_called_with((problems))
+
+    @patch('flow_control.flow.Fragment')
+    def test_student_view(self, fragment_mock):
+        """
+        It should return the student view
+        """
+
+        # prepare
+        fragment_instance = MagicMock()
+        fragment_mock.return_value = fragment_instance
+        self.block.xmodule_runtime = MagicMock()
+        # execute code
+        self.block.student_view(context=None)
+
+        # asserts
+        fragment_mock.assert_called()
+        fragment_instance.add_javascript.assert_called()
+        fragment_instance.initialize_js.assert_called()
+
+    @patch('flow_control.flow.Fragment')
+    def test_author_view(self, fragment_mock):
+        """
+        It should return the author view
+        """
+
+        # prepare
+        fragment_instance = MagicMock()
+        fragment_mock.return_value = fragment_instance
+
+        # execute code
+        self.block.author_view(context=None)
+
+        # asserts
+        fragment_mock.assert_called()
+        fragment_instance.add_javascript.assert_called()
+        fragment_instance.initialize_js.assert_called()
