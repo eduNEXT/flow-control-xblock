@@ -8,6 +8,7 @@ from xblock.core import XBlock
 from xblock.fragment import Fragment
 from xblock.fields import Scope, Integer, String
 from xblockutils.studio_editable import StudioEditableXBlockMixin
+from xblock.validation import ValidationMessage
 from courseware.model_data import ScoresClient
 from opaque_keys.edx.keys import UsageKey
 
@@ -63,10 +64,10 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
     action = String(display_name="Action",
                     help="Select an action to apply given the condition",
                     scope=Scope.content,
-                    default="No action",
+                    default="Show a message",
                     values_provider=_actions_generator)
 
-    condition = String(display_name="Condition",
+    condition = String(display_name="Flow control condition",
                        help="Select a conditon to check",
                        scope=Scope.content,
                        default='Grade on certain problem',
@@ -128,6 +129,22 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
                        'target_id',
                        'message')
 
+    def validate_field_data(self, validation, data):
+        """
+        Validate this block's field data
+        """
+
+        if data.tab_to <= 0:
+            validation.add(ValidationMessage(
+                ValidationMessage.ERROR,
+                u"Tab to redirect field must be greater than zero"))
+
+        if data.ref_value < 0 or data.ref_value > 100:
+            validation.add(ValidationMessage(
+                ValidationMessage.ERROR,
+                u"Score percentage field must "
+                u"be an integer number between 1 and 100"))
+
     def get_location_string(self, locator):
         """  Returns the location string for one problem, given its id  """
         # pylint: disable=no-member
@@ -152,12 +169,11 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
 
         if self.condition == 'Grade on certain problem':
             problems = self.problem_id.split()
-            usage_str = self.get_location_string(problems[0])
-            condition_reached = self.condition_problem(usage_str)
 
         if self.condition == 'Grade on certain list of problems':
             problems = self.list_of_problems.split()
-            condition_reached = self.condition_on_problem_list(problems)
+
+        condition_reached = self.condition_on_problem_list(problems)
 
         return condition_reached
 
@@ -237,33 +253,34 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
 
         return result
 
-    def condition_problem(self, location_str):
-        """  Returns the score for one problem """
-        # pylint: disable=no-member
-        usage_key = UsageKey.from_string(location_str)
-        user_id = self.xmodule_runtime.user_id
-
-        scores_client = ScoresClient(self.course_id, user_id)
-        scores_client.fetch_scores([usage_key])
-        score = scores_client.get(usage_key)
-
-        return self.compare_scores(score.correct, score.total)
-
     def condition_on_problem_list(self, problems):
         """ Returns the score for a list of problems """
         # pylint: disable=no-member
         user_id = self.xmodule_runtime.user_id
         scores_client = ScoresClient(self.course_id, user_id)
+        scores_reducile_length = 2
         total = 0
         correct = 0
 
-        for problem in problems:
-            location_str = self.get_location_string(problem)
-            usage_key = UsageKey.from_string(location_str)
-            scores_client.fetch_scores([usage_key])
-            score = scores_client.get(usage_key)
-            if score.total:
-                total += score.total
-                correct += score.correct
+        def _get_usage_key(problem):
+
+            loc = self.get_location_string(problem)
+            try:
+                uk = UsageKey.from_string(loc)
+            except Exception:
+                uk = None
+            return uk
+
+        usages_keys = map(_get_usage_key, problems)
+        scores_client.fetch_scores(usages_keys)
+        scores = map(scores_client.get, usages_keys)
+        scores = filter(None, scores)
+
+        if scores and len(scores) >= scores_reducile_length:
+            correct = reduce(lambda x, y: x.correct + y.correct, scores)
+            total = reduce(lambda x, y: x.total + y.total, scores)
+        if scores and len(scores) == 1:
+            correct = scores[0].correct
+            total = scores[0].total
 
         return self.compare_scores(correct, total)
