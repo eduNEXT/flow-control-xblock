@@ -107,7 +107,6 @@ class TestBuilderBlocks(unittest.TestCase):
         # prepare
         self.block.condition = 'Grade on certain problem'
         self.block.get_location_string = MagicMock()
-        self.block.condition_problem = MagicMock()
         self.block.condition_on_problem_list = MagicMock()
         self.block.problem_id = '    ndsjkjhgs78768346  '
         self.block.list_of_problems = 'ndsjkjhg8768346fd  njhgs78ikdgshuhg46  '
@@ -116,9 +115,7 @@ class TestBuilderBlocks(unittest.TestCase):
         self.block.get_condition_status()
 
         # asserts
-        self.block.get_location_string.assert_called_with(problems[0])
-        self.block.condition_problem.assert_called_with(
-            self.block.get_location_string(problems[0]))
+        self.block.condition_on_problem_list.assert_called_with((problems))
 
         # prepare for a different condifiton
         self.block.condition = 'Grade on certain list of problems'
