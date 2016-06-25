@@ -258,7 +258,7 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
         # pylint: disable=no-member
         user_id = self.xmodule_runtime.user_id
         scores_client = ScoresClient(self.course_id, user_id)
-        scores_reducile_length = 2
+        scores_reducible_length = 2
         total = 0
         correct = 0
 
@@ -276,7 +276,7 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
         scores = map(scores_client.get, usages_keys)
         scores = filter(None, scores)
 
-        if scores and len(scores) >= scores_reducile_length:
+        if scores and len(scores) >= scores_reducible_length:
             correct = reduce(lambda x, y: x.correct + y.correct, scores)
             total = reduce(lambda x, y: x.total + y.total, scores)
         if scores and len(scores) == 1:
