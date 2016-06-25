@@ -1,3 +1,8 @@
+==================================
+XBlock flow-control |build-status|
+==================================
+
+
 The Flow Control Xblock provides distinct
 course path according to certain condition
 
@@ -21,5 +26,5 @@ Features include:
   to check the selected condition.
 
 
-
-
+.. |build-status| image:: https://travis-ci.org/eduNEXT/flow-control-xblock.svg?branch=master
+   :target: https://travis-ci.org/eduNEXT/flow-control-xblock
