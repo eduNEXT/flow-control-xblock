@@ -14,15 +14,15 @@ var settings = {
 
 var actions = {
   noAct: 'No action',
-  redirectTab: 'Redirect to tab by id, same section',
-  redirectUrl: 'Redirect to URL',
+  redirectTab: 'Redirect to a given unit in the same subsection',
+  redirectUrl: 'Redirect to a given URL',
   redirectJump: 'Redirect using jump_to_id',
-  show_message: 'Show a message'
+  show_message: 'Display a message'
 };
 
 var conditions = {
-  gradeOnProblem: 'Grade on certain problem',
-  gradeOnSection: 'Grade on certain list of problems',
+  gradeOnProblem: 'Grade of a problem',
+  gradeOnSection: 'Average grade of a list of problems',
   setConditionStatus: function setConditionStatus(data) {
     settings.conditionReached = data.status;
   }

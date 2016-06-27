@@ -32,32 +32,32 @@ class TestBuilderBlocks(unittest.TestCase):
         It should return a list with allowed actions
         """
         actions_allowed = _actions_generator(self.block)
-        actions = ['No action',
-                   'Redirect to tab by id, same section',
-                   'Redirect to URL',
+        actions = ['Display a message',
                    'Redirect using jump_to_id',
-                   'Show a message']
+                   'Redirect to a given unit in the same subsection',
+                   'Redirect to a given URL'
+                   ]
         self.assertEqual(actions, actions_allowed)
 
     def test_conditions_generator(self):
         """
-        It should return a list with allowed actions
+        It should return a list with allowed conditions
         """
         conditions_allowed = _conditions_generator(self.block)
-        conditions = ['Grade on certain problem',
-                      'Grade on certain list of problems']
+        conditions = ['Grade of a problem',
+                      'Average grade of a list of problems']
         self.assertEqual(conditions, conditions_allowed)
 
     def test_operators_generator(self):
         """
-        It should return list with allowed actions
+        It should return list with allowed operators
         """
         operators_allowed = _operators_generator(self.block)
-        operators = ['equal',
-                     'distinct',
+        operators = ['equal to',
+                     'not equal to',
                      'less than or equal to',
-                     'greater than or equal to',
                      'less than',
+                     'greater than or equal to',
                      'greater than']
         self.assertEqual(operators, operators_allowed)
 
@@ -105,7 +105,7 @@ class TestBuilderBlocks(unittest.TestCase):
         """
 
         # prepare
-        self.block.condition = 'Grade on certain problem'
+        self.block.condition = 'Grade of a problem'
         self.block.get_location_string = MagicMock()
         self.block.condition_on_problem_list = MagicMock()
         self.block.problem_id = '    ndsjkjhgs78768346  '
@@ -118,7 +118,7 @@ class TestBuilderBlocks(unittest.TestCase):
         self.block.condition_on_problem_list.assert_called_with((problems))
 
         # prepare for a different condifiton
-        self.block.condition = 'Grade on certain list of problems'
+        self.block.condition = 'Average grade of a list of problems'
 
         # execute code
         self.block.get_condition_status()
