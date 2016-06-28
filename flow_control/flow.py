@@ -3,6 +3,7 @@
 
 import logging
 import pkg_resources
+import re
 
 from xblock.core import XBlock
 from xblock.fragment import Fragment
@@ -11,7 +12,6 @@ from xblockutils.studio_editable import StudioEditableXBlockMixin
 from xblock.validation import ValidationMessage
 from courseware.model_data import ScoresClient
 from opaque_keys.edx.keys import UsageKey
-
 
 LOGGER = logging.getLogger(__name__)
 
@@ -177,10 +177,15 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
         problems = []
 
         if self.condition == 'Grade of a problem':
-            problems = self.problem_id.split()
+            # now split problem id by spaces or commas
+            problems = re.split('\s*,*|\s*,\s*', self.problem_id)
+            problems = filter(None, problems)
+            problems = problems[:1]
 
         if self.condition == 'Average grade of a list of problems':
-            problems = self.list_of_problems.split()
+            # now split list of problems id by spaces or commas
+            problems = re.split('\s*,*|\s*,\s*', self.list_of_problems)
+            problems = filter(None, problems)
 
         condition_reached = self.condition_on_problem_list(problems)
 
@@ -267,7 +272,8 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
         # pylint: disable=no-member
         user_id = self.xmodule_runtime.user_id
         scores_client = ScoresClient(self.course_id, user_id)
-        scores_reducible_length = 2
+        correct_neutral = {'correct': 0.0}
+        total_neutral = {'total': 0.0}
         total = 0
         correct = 0
 
@@ -280,16 +286,31 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
                 uk = None
             return uk
 
+        def _to_reducible(score):
+            correct_default = 0.0
+            total_default = 1.0
+            if not score.total:
+                return {'correct': correct_default, 'total': total_default}
+            else:
+                return {'correct': score.correct, 'total': score.total}
+
+        def _calculate_correct(first_score, second_score):
+            correct = first_score['correct'] + second_score['correct']
+            return {'correct': correct}
+
+        def _calculate_total(first_score, second_score):
+            total = first_score['total'] + second_score['total']
+            return {'total': total}
+
         usages_keys = map(_get_usage_key, problems)
         scores_client.fetch_scores(usages_keys)
         scores = map(scores_client.get, usages_keys)
         scores = filter(None, scores)
 
-        if scores and len(scores) >= scores_reducible_length:
-            correct = reduce(lambda x, y: x.correct + y.correct, scores)
-            total = reduce(lambda x, y: x.total + y.total, scores)
-        if scores and len(scores) == 1:
-            correct = scores[0].correct
-            total = scores[0].total
+        reducible_scores = map(_to_reducible, scores)
+        correct = reduce(_calculate_correct, reducible_scores,
+                         correct_neutral)
+        total = reduce(_calculate_total, reducible_scores,
+                       total_neutral)
 
-        return self.compare_scores(correct, total)
+        return self.compare_scores(correct['correct'], total['total'])
