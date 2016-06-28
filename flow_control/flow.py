@@ -179,12 +179,14 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
         if self.condition == 'Grade of a problem':
             # now split problem id by spaces or commas
             problems = re.split('\s*,*|\s*,\s*', self.problem_id)
+            problems = filter(None, problems)
+            problems = problems[:1]
 
         if self.condition == 'Average grade of a list of problems':
             # now split list of problems id by spaces or commas
             problems = re.split('\s*,*|\s*,\s*', self.list_of_problems)
+            problems = filter(None, problems)
 
-        problems = filter(None, problems)
         condition_reached = self.condition_on_problem_list(problems)
 
         return condition_reached
