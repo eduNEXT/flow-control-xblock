@@ -1,5 +1,5 @@
-""" Flow Control Xblock allows to provide distinct
-course path according to certain conditions """
+""" Flow Control Xblock allows to evaluate a condition and based on the outcome
+ either display the unit's content or take an alternative action """
 
 import logging
 import pkg_resources
@@ -23,28 +23,29 @@ def load(path):
 
 
 def _actions_generator(block):  # pylint: disable=unused-argument
-    """ Generates a list of possible actions to apply """
+    """ Generates a list of possible actions to
+    take when the condition is met """
 
-    return ['No action',
-            'Redirect to tab by id, same section',
-            'Redirect to URL',
+    return ['Display a message',
             'Redirect using jump_to_id',
-            'Show a message']
+            'Redirect to a given unit in the same subsection',
+            'Redirect to a given URL'
+            ]
 
 
 def _conditions_generator(block):  # pylint: disable=unused-argument
     """ Generates a list of possible conditions to evaluate """
-    return ['Grade on certain problem',
-            'Grade on certain list of problems']
+    return ['Grade of a problem',
+            'Average grade of a list of problems']
 
 
 def _operators_generator(block):  # pylint: disable=unused-argument
     """ Generates a list of possible operators to use """
-    return ['equal',
-            'distinct',
+    return ['equal to',
+            'not equal to',
             'less than or equal to',
-            'greater than or equal to',
             'less than',
+            'greater than or equal to',
             'greater than']
 
 
@@ -62,59 +63,67 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
     )
 
     action = String(display_name="Action",
-                    help="Select an action to apply given the condition",
+                    help="Select the action to be performed "
+                    "when the condition is met",
                     scope=Scope.content,
-                    default="Show a message",
+                    default="Display a message",
                     values_provider=_actions_generator)
 
     condition = String(display_name="Flow control condition",
-                       help="Select a conditon to check",
+                       help="Select a conditon to evaluate",
                        scope=Scope.content,
-                       default='Grade on certain problem',
+                       default='Grade of a problem',
                        values_provider=_conditions_generator)
 
     operator = String(display_name="Comparison type",
-                      help="Select a operator to evaluate the condition",
+                      help="Select an operator for the condition",
                       scope=Scope.content,
-                      default='equal',
+                      default='equal to',
                       values_provider=_operators_generator)
 
-    ref_value = Integer(help="Value to use for comparison",
+    ref_value = Integer(help="Enter the value to be used in "
+                        "the comparison. (From 0 to 100)",
                         default=0,
                         scope=Scope.content,
                         display_name="Score percentage")
 
-    tab_to = Integer(help="Number of unit tab to redirect",
+    tab_to = Integer(help="Number of unit tab to redirect to. (1, 2, 3...)",
                      default=1,
                      scope=Scope.content,
-                     display_name="Tab to redirect")
+                     display_name="Tab to redirect to")
 
-    target_url = String(help="Url to redirect, supports relative"
-                        " or absolute urls",
+    target_url = String(help="URL to redirect to, supports relative "
+                        "or absolute urls",
                         scope=Scope.content,
-                        display_name="URL to redirect")
+                        display_name="URL to redirect to")
 
-    target_id = String(help="Unit Id to redirect",
+    target_id = String(help="Unit identifier to redirect to (Location id)",
                        scope=Scope.content,
-                       display_name="Id to redirect")
+                       display_name="Unit identifier to redirect to")
 
-    message = String(help="Write a message for LMS users",
+    message = String(help="Message for the learners to view "
+                     "when the condition is met",
                      scope=Scope.content,
                      default='',
                      display_name="Message",
                      multiline_editor='html')
 
-    problem_id = String(help="Problem Id to check the condition",
+    problem_id = String(help="Problem id to use for the condition.  (Not the "
+                        "complete problem locator. Only the 32 characters "
+                        "alfanumeric id. "
+                        "Example: 618c5933b8b544e4a4cc103d3e508378)",
                         scope=Scope.content,
-                        display_name="Problem Id")
+                        display_name="Problem id")
 
-    list_of_problems = String(help="List of problems Ids separated by spaces "
-                              "to check the condition. Each score is "
-                              "calculated independently, then an overall "
-                              "score is obtained",
+    list_of_problems = String(help="List of problems ids separated by commas "
+                              "or line breaks. (Not the complete problem "
+                              "locators. Only the 32 characters alfanumeric "
+                              "ids. Example: 618c5933b8b544e4a4cc103d3e508378"
+                              ", 905333bd98384911bcec2a94bc30155f). "
+                              "The simple average score for all problems will "
+                              "be used.",
                               scope=Scope.content,
                               display_name="List of problems",
-                              default='',
                               multiline_editor=True,
                               resettable_editor=False)
 
@@ -137,13 +146,13 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
         if data.tab_to <= 0:
             validation.add(ValidationMessage(
                 ValidationMessage.ERROR,
-                u"Tab to redirect field must be greater than zero"))
+                u"Tab to redirect to must be greater than zero"))
 
         if data.ref_value < 0 or data.ref_value > 100:
             validation.add(ValidationMessage(
                 ValidationMessage.ERROR,
                 u"Score percentage field must "
-                u"be an integer number between 1 and 100"))
+                u"be an integer number between 0 and 100"))
 
     def get_location_string(self, locator):
         """  Returns the location string for one problem, given its id  """
@@ -167,10 +176,10 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
         condition_reached = False
         problems = []
 
-        if self.condition == 'Grade on certain problem':
+        if self.condition == 'Grade of a problem':
             problems = self.problem_id.split()
 
-        if self.condition == 'Grade on certain list of problems':
+        if self.condition == 'Average grade of a list of problems':
             problems = self.list_of_problems.split()
 
         condition_reached = self.condition_on_problem_list(problems)
@@ -238,9 +247,9 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
             # getting percentage score for that section
             percentage = (correct / total) * 100
 
-            if self.operator == 'equal':
+            if self.operator == 'equal to':
                 result = percentage == self.ref_value
-            if self.operator == 'distinct':
+            if self.operator == 'not equal to':
                 result = percentage != self.ref_value
             if self.operator == 'less than or equal to':
                 result = percentage <= self.ref_value
