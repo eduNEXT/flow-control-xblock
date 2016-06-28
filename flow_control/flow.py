@@ -26,27 +26,45 @@ def _actions_generator(block):  # pylint: disable=unused-argument
     """ Generates a list of possible actions to
     take when the condition is met """
 
-    return ['Display a message',
-            'Redirect using jump_to_id',
-            'Redirect to a given unit in the same subsection',
-            'Redirect to a given URL'
-            ]
+    return [
+        {"display_name": "Display a message",
+         "value": "display_message"},
+        {"display_name": "Redirect using jump_to_id",
+         "value": "to_jump"},
+        {"display_name": "Redirect to a given unit in the same subsection",
+         "value": "to_unit"},
+        {"display_name": "Redirect to a given URL",
+         "value": "to_url"}
+    ]
 
 
 def _conditions_generator(block):  # pylint: disable=unused-argument
     """ Generates a list of possible conditions to evaluate """
-    return ['Grade of a problem',
-            'Average grade of a list of problems']
+    return [
+        {"display_name": "Grade of a problem",
+         "value": "single_problem"},
+        {"display_name": "Average grade of a list of problems",
+         "value": "average_problems"}
+    ]
 
 
 def _operators_generator(block):  # pylint: disable=unused-argument
     """ Generates a list of possible operators to use """
-    return ['equal to',
-            'not equal to',
-            'less than or equal to',
-            'less than',
-            'greater than or equal to',
-            'greater than']
+
+    return [
+        {"display_name": "equal to",
+         "value": "eq"},
+        {"display_name": "not equal to",
+         "value": "noeq"},
+        {"display_name": "less than or equal to",
+         "value": "lte"},
+        {"display_name": "less than",
+         "value": "lt"},
+        {"display_name": "greater than or equal to",
+         "value": "gte"},
+        {"display_name": "greater than",
+         "value": "gt"}
+    ]
 
 
 @XBlock.needs("i18n")
@@ -66,19 +84,19 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
                     help="Select the action to be performed "
                     "when the condition is met",
                     scope=Scope.content,
-                    default="Display a message",
+                    default="display_message",
                     values_provider=_actions_generator)
 
     condition = String(display_name="Flow control condition",
                        help="Select a conditon to evaluate",
                        scope=Scope.content,
-                       default='Grade of a problem',
+                       default='single_problem',
                        values_provider=_conditions_generator)
 
     operator = String(display_name="Comparison type",
                       help="Select an operator for the condition",
                       scope=Scope.content,
-                      default='equal to',
+                      default='eq',
                       values_provider=_operators_generator)
 
     ref_value = Integer(help="Enter the value to be used in "
@@ -176,13 +194,13 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
         condition_reached = False
         problems = []
 
-        if self.condition == 'Grade of a problem':
+        if self.condition == 'single_problem':
             # now split problem id by spaces or commas
             problems = re.split('\s*,*|\s*,\s*', self.problem_id)
             problems = filter(None, problems)
             problems = problems[:1]
 
-        if self.condition == 'Average grade of a list of problems':
+        if self.condition == 'average_problems':
             # now split list of problems id by spaces or commas
             problems = re.split('\s*,*|\s*,\s*', self.list_of_problems)
             problems = filter(None, problems)
@@ -252,17 +270,17 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
             # getting percentage score for that section
             percentage = (correct / total) * 100
 
-            if self.operator == 'equal to':
+            if self.operator == 'eq':
                 result = percentage == self.ref_value
-            if self.operator == 'not equal to':
+            if self.operator == 'noeq':
                 result = percentage != self.ref_value
-            if self.operator == 'less than or equal to':
+            if self.operator == 'lte':
                 result = percentage <= self.ref_value
-            if self.operator == 'greater than or equal to':
+            if self.operator == 'gte':
                 result = percentage >= self.ref_value
-            if self.operator == 'less than':
+            if self.operator == 'lt':
                 result = percentage < self.ref_value
-            if self.operator == 'greater than':
+            if self.operator == 'gt':
                 result = percentage > self.ref_value
 
         return result
