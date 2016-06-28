@@ -32,11 +32,16 @@ class TestBuilderBlocks(unittest.TestCase):
         It should return a list with allowed actions
         """
         actions_allowed = _actions_generator(self.block)
-        actions = ['Display a message',
-                   'Redirect using jump_to_id',
-                   'Redirect to a given unit in the same subsection',
-                   'Redirect to a given URL'
-                   ]
+        actions = [
+            {"display_name": "Display a message",
+             "value": "display_message"},
+            {"display_name": "Redirect using jump_to_id",
+             "value": "to_jump"},
+            {"display_name": "Redirect to a given unit in the same subsection",
+             "value": "to_unit"},
+            {"display_name": "Redirect to a given URL",
+             "value": "to_url"}
+        ]
         self.assertEqual(actions, actions_allowed)
 
     def test_conditions_generator(self):
@@ -44,8 +49,12 @@ class TestBuilderBlocks(unittest.TestCase):
         It should return a list with allowed conditions
         """
         conditions_allowed = _conditions_generator(self.block)
-        conditions = ['Grade of a problem',
-                      'Average grade of a list of problems']
+        conditions = [
+            {"display_name": "Grade of a problem",
+             "value": "single_problem"},
+            {"display_name": "Average grade of a list of problems",
+             "value": "average_problems"}
+        ]
         self.assertEqual(conditions, conditions_allowed)
 
     def test_operators_generator(self):
@@ -53,12 +62,20 @@ class TestBuilderBlocks(unittest.TestCase):
         It should return list with allowed operators
         """
         operators_allowed = _operators_generator(self.block)
-        operators = ['equal to',
-                     'not equal to',
-                     'less than or equal to',
-                     'less than',
-                     'greater than or equal to',
-                     'greater than']
+        operators = [
+            {"display_name": "equal to",
+             "value": "eq"},
+            {"display_name": "not equal to",
+             "value": "noeq"},
+            {"display_name": "less than or equal to",
+             "value": "lte"},
+            {"display_name": "less than",
+             "value": "lt"},
+            {"display_name": "greater than or equal to",
+             "value": "gte"},
+            {"display_name": "greater than",
+             "value": "gt"}
+        ]
         self.assertEqual(operators, operators_allowed)
 
     def test_load(self):
@@ -105,7 +122,7 @@ class TestBuilderBlocks(unittest.TestCase):
         """
 
         # prepare
-        self.block.condition = 'Grade of a problem'
+        self.block.condition = 'single_problem'
         self.block.get_location_string = MagicMock()
         self.block.condition_on_problem_list = MagicMock()
         self.block.problem_id = '    ndsjkjhgs78768346  '
@@ -118,7 +135,7 @@ class TestBuilderBlocks(unittest.TestCase):
         self.block.condition_on_problem_list.assert_called_with((problems))
 
         # prepare for a different condifiton
-        self.block.condition = 'Average grade of a list of problems'
+        self.block.condition = 'average_problems'
 
         # execute code
         self.block.get_condition_status()
