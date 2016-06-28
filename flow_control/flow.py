@@ -12,6 +12,7 @@ from xblockutils.studio_editable import StudioEditableXBlockMixin
 from xblock.validation import ValidationMessage
 from courseware.model_data import ScoresClient
 from opaque_keys.edx.keys import UsageKey
+from opaque_keys import InvalidKeyError
 
 LOGGER = logging.getLogger(__name__)
 
@@ -172,20 +173,30 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
                 u"Score percentage field must "
                 u"be an integer number between 0 and 100"))
 
-    def get_location_string(self, locator):
+    def get_location_string(self, locator, is_draft=False):
         """  Returns the location string for one problem, given its id  """
         # pylint: disable=no-member
         course_prefix = 'course'
         resource = 'problem'
         course_url = self.course_id.to_deprecated_string()
-        course_url = course_url.split(course_prefix)[-1]
 
-        location_string = '{prefix}{couse_str}+{type}@{type_id}+{prefix}@{locator}'.format(
-            prefix=self.course_id.BLOCK_PREFIX,
-            couse_str=course_url,
-            type=self.course_id.BLOCK_TYPE_PREFIX,
-            type_id=resource,
-            locator=locator)
+        if is_draft:
+            course_url = course_url.split(self.course_id.run)[0]
+            prefix = 'i4x://'
+            location_string = '{prefix}{couse_str}{type_id}/{locator}'.format(
+                prefix=prefix,
+                couse_str=course_url,
+                type_id=resource,
+                locator=locator)
+        else:
+            course_url = course_url.split(course_prefix)[-1]
+
+            location_string = '{prefix}{couse_str}+{type}@{type_id}+{prefix}@{locator}'.format(
+                prefix=self.course_id.BLOCK_PREFIX,
+                couse_str=course_url,
+                type=self.course_id.BLOCK_TYPE_PREFIX,
+                type_id=resource,
+                locator=locator)
 
         return location_string
 
@@ -300,8 +311,19 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
             loc = self.get_location_string(problem)
             try:
                 uk = UsageKey.from_string(loc)
-            except Exception:
+            except InvalidKeyError:
+                uk = _get_draft_usage_key(problem)
+            return uk
+
+        def _get_draft_usage_key(problem):
+
+            loc = self.get_location_string(problem, True)
+            try:
+                uk = UsageKey.from_string(loc)
+                uk = uk.map_into_course(self.course_id)
+            except InvalidKeyError:
                 uk = None
+
             return uk
 
         def _to_reducible(score):
