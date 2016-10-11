@@ -18,6 +18,12 @@ root folder:
 $ pip install -r requirements.txt
 ```
 
+After successful installation, you can activate this component following
+this steps:
+
+* Go to Studio Advanced Settings section.
+* Add ```"flow-control"``` to the Advanced Module List setting.
+
 Features include:
 
 * **Studio editable settings:** allows to select custom actions or
