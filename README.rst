@@ -6,6 +6,7 @@ The Flow Control Xblock provides a way to display the content of a
 unit or to redirect the user based on compliance with a condition
 that evaluates the submission or the score of a problem or a set 
 of problems.
+TODO: add an image
 
 Installation
 ------------
@@ -33,7 +34,13 @@ course following these steps:
 Usage
 -----
 
+TODO: add a description of how to use the xblock
 
+
+Common use cases
+----------------
+
+TODO: add a description 
 
 
 Features include
@@ -41,29 +48,32 @@ Features include
 
 * **Studio editable settings:** allows to select custom actions or
   conditions to apply flow control on LMS contents.
-* **Custom operators:** allows to select a custom operator
+* **WYSIWYG editor:** TODO: add a description.
+* **Condition operators:** allows to select a custom operator
   to check the selected condition.
 
 Testing
 -------
 
+TODO: add a description 
 
 i18n compatibility
 ------------------
 
+TODO: add a description 
 
 About this xblock
 -----------------
 
 The Flow control Xblock was built by [eduNEXT](https://edunext.co), a company specialized in open edX development and services.
 
-It was presented at the open edX con 2016 at Stanford university.
+It was presented at the open edX con 2016 at Stanford University.
 
 
 How to contribute
 -----------------
 
-
+TODO: add a description 
 
 
 .. |build-status| image:: https://travis-ci.org/eduNEXT/flow-control-xblock.svg?branch=master
