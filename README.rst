@@ -17,6 +17,7 @@ root folder:
 ```
 $ pip install -r requirements.txt
 ```
+
 Enabling in Studio
 -------------------
 
