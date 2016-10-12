@@ -2,10 +2,10 @@
 XBlock flow-control |build-status|
 ==================================
 
-
-The Flow Control Xblock provides distinct
-course path according to certain condition
-
+The Flow Control Xblock provides a way to display the content of a
+unit or to redirect the user based on compliance with a condition
+that evaluates the submission or the score of a problem or a set 
+of problems.
 
 Installation
 ------------
@@ -17,12 +17,16 @@ root folder:
 ```
 $ pip install -r requirements.txt
 ```
+Enabling in Studio
+-------------------
 
-After successful installation, you can activate this component following
-this steps:
+After successful installation, you can activate this component for a course
+following these steps:
 
-* Go to Studio Advanced Settings section.
-* Add ```"flow-control"``` to the Advanced Module List setting.
+* From the main page of a specific course, navigate to `Settings ->
+   Advanced Settings` from the top menu.
+* Check for the `Advanced Module List` policy key, and Add ```"flow-control"``` to the policy value list.
+* Click the "Save changes" button.
 
 Features include:
 
