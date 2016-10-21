@@ -58,33 +58,33 @@ Features include
 
 **Studio editable settings:** Allows to select the conditions and operators to evaluate and the actions to apply in a particular unit.
 
-**Condition types:** Currently, the xblock features evaluating the score of a single problem and the average score of a list of problems
+**Condition types:** Currently, the xblock features evaluating the score of a single problem and the average score of a list of problems.
 
 **Condition operators:** The implemented operators are:
 
-* equals
-* not equal to
-* greather than
-* greather than or equal to
-* less than
-* less than or equal to
-* is empty
-* is not empty
-* has empty
+* Equals
+* Not equal to
+* Greather than
+* Greather than or equal to
+* Less than
+* Less than or equal to
+* Is empty
+* Is not empty
+* Has empty
 
 **Actions:** This actions can be applied when a condition is met:
 
 * Display a message
 * Redirect to another unit in the same subsection (without reloading the page)
 * Redirect to another unit using jump_to_id (reloading the page)
-* Redirect to a given url.
+* Redirect to a given url
 
 **WYSIWYG editor:** A simple to use HTML editor to simplify writing the content or message that learners will get if the condition is met.
 
 About this xblock
 -----------------
 
-The Flow control Xblock was built by `eduNEXT <https://www.edunext.co>`_, a company specialized in open edX development and services.
+The Flow control Xblock was built by `eduNEXT <https://www.edunext.co>`_, a company specialized in open edX development and open edX cloud services.
 
 It was presented at the open edX con 2016 at Stanford University.
 
@@ -95,7 +95,7 @@ How to contribute
 * Fork this repository.
 * Commit your changes on a new branch
 * Make a pull request to the master branch
-* Wait for code review and merge process
+* Wait for the code review and merge process
 
 
 .. |build-status| image:: https://travis-ci.org/eduNEXT/flow-control-xblock.svg?branch=master
