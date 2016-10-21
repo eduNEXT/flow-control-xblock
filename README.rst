@@ -2,17 +2,12 @@
 XBlock flow-control |build-status|
 ==================================
 
-The Flow Control Xblock provides a way to display the content of a
-unit or to redirect the user elsewhere based on compliance with a condition
-that evaluates the submission or the score of a problem or a set 
-of problems.
+The Flow Control Xblock provides a way to display the content of a unit or to redirect the user elsewhere based on compliance with a condition that evaluates the submission or the score of a problem or a set of problems.
 
 Installation
 ------------
 
-Install the requirements into the Python virtual environment of your
-`edx-platform` installation by running the following command from the
-root folder:
+Install the requirements into the Python virtual environment of your `edx-platform` installation by running the following command from the root folder:
 
 ```
 $ pip install -r requirements.txt
@@ -30,8 +25,7 @@ course following these steps:
 
 Usage
 -----
-Add a Flow Control component to the content unit you want to control access to,
-and follow these steps on "settings":
+Include the Flow Control component in the content unit you want to control access to, and follow these steps on "settings":
 
 * Select the condition to check.
 * Enter the problem locator ids (as many as required) to evaluate the condition.
