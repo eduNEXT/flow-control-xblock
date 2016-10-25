@@ -64,7 +64,13 @@ def _operators_generator(block):  # pylint: disable=unused-argument
         {"display_name": "greater than or equal to",
          "value": "gte"},
         {"display_name": "greater than",
-         "value": "gt"}
+         "value": "gt"},
+        {"display_name": "none of the problems have been answered",
+         "value": "all_null"},
+        {"display_name": "all problems have been answered",
+         "value": "all_not_null"},
+        {"display_name": "some problem has not been answered",
+         "value": "has_null"}
     ]
 
 
@@ -296,6 +302,39 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
 
         return result
 
+    def are_all_not_null(self, problems_to_answer):
+        """  Returns true when all problems have been answered """
+        result = False
+        all_problems_were_answered = all(problems_to_answer)
+        if all_problems_were_answered:
+            result = True
+        return result
+
+    def has_null(self, problems_to_answer):
+        """  Returns true when at least one problem have not been answered """
+        result = False
+        all_problems_were_answered = all(problems_to_answer)
+        if not all_problems_were_answered:
+            result = True
+        return result
+
+    def are_all_null(self, problems_to_answer):
+        """  Returns true when all problems have not been answered """
+        result = False
+        all_problems_were_answered = all(problems_to_answer)
+        not_answered_quantity = reduce(lambda x, y: x + (1 if not y else 0),
+                                       problems_to_answer, 0)
+
+        if not all_problems_were_answered and not_answered_quantity == len(problems_to_answer):
+            result = True
+        return result
+
+    SPECIAL_COMPARISON_DISPATCHER = {
+        'all_not_null': are_all_not_null,
+        'all_null': are_all_null,
+        'has_null': has_null
+    }
+
     def condition_on_problem_list(self, problems):
         """ Returns the score for a list of problems """
         # pylint: disable=no-member
@@ -346,6 +385,14 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
         scores_client.fetch_scores(usages_keys)
         scores = map(scores_client.get, usages_keys)
         scores = filter(None, scores)
+
+        problems_to_answer = [score.total for score in scores]
+        if self.operator in self.SPECIAL_COMPARISON_DISPATCHER.keys():
+            evaluation = self.SPECIAL_COMPARISON_DISPATCHER[self.operator](
+                self,
+                problems_to_answer)
+
+            return evaluation
 
         reducible_scores = map(_to_reducible, scores)
         correct = reduce(_calculate_correct, reducible_scores,

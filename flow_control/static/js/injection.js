@@ -28,12 +28,19 @@ var conditions = {
   }
 };
 
+var nonComparableOperators = {
+  allNull: 'all_null',
+  allNotNull: 'all_not_null',
+  hasNull: 'has_null'
+};
+
 var uiSelectors = {
   settingsFields: '#settings-tab > ul > li',
   visibility: 'header.xblock-header-flow-control li.action-item.action-visibility',
   duplicate: 'header.xblock-header-flow-control li.action-item.action-duplicate',
   action: '#xb-field-edit-action',
-  condition: '#xb-field-edit-condition'
+  condition: '#xb-field-edit-condition',
+  operator: '#xb-field-edit-operator'
 };
 
 var viewblocks = {
@@ -43,7 +50,6 @@ var viewblocks = {
     $(uiSelectors.settingsFields).filter('[data-field-name="condition"]').show();
     $(uiSelectors.settingsFields).filter('[data-field-name="action"]').show();
     $(uiSelectors.settingsFields).filter('[data-field-name="operator"]').show();
-    $(uiSelectors.settingsFields).filter('[data-field-name="ref_value"]').show();
 
     switch ($(uiSelectors.action).val()) {
     case actions.redirectTab:
@@ -67,6 +73,15 @@ var viewblocks = {
     case conditions.gradeOnSection:
       $(uiSelectors.settingsFields).filter('[data-field-name="list_of_problems"]').show();
       break;
+    }
+
+    var specialOperators = [];
+    for (var type in nonComparableOperators) {
+      specialOperators.push(nonComparableOperators[type]);
+    }
+
+    if ($.inArray($(uiSelectors.operator).val(),specialOperators) == -1 ) {
+      $(uiSelectors.settingsFields).filter('[data-field-name="ref_value"]').show();
     }
   },
   applyFlowControl: function applyFlowControl(condition) {
@@ -186,7 +201,7 @@ function EditFlowControl(runtime, element) {
 
   viewblocks.hideNotAllowedOption();
 
-  $('#xb-field-edit-action, #xb-field-edit-condition').on('change', function changeHandler() {
+  $('#xb-field-edit-action, #xb-field-edit-condition, #xb-field-edit-operator').on('change', function changeHandler() {
     viewblocks.hideNotAllowedOption();
   });
 }

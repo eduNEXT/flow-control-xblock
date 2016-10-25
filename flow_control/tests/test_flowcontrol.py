@@ -74,7 +74,13 @@ class TestBuilderBlocks(unittest.TestCase):
             {"display_name": "greater than or equal to",
              "value": "gte"},
             {"display_name": "greater than",
-             "value": "gt"}
+             "value": "gt"},
+            {"display_name": "none of the problems have been answered",
+             "value": "all_null"},
+            {"display_name": "all problems have been answered",
+                "value": "all_not_null"},
+            {"display_name": "some problem has not been answered",
+                "value": "has_null"}
         ]
         self.assertEqual(operators, operators_allowed)
 
