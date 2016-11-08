@@ -211,18 +211,19 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
         condition_reached = False
         problems = []
 
-        if self.condition == 'single_problem':
+        if self.problem_id and self.condition == 'single_problem':
             # now split problem id by spaces or commas
             problems = re.split('\s*,*|\s*,\s*', self.problem_id)
             problems = filter(None, problems)
             problems = problems[:1]
 
-        if self.condition == 'average_problems':
+        if self.list_of_problems and self.condition == 'average_problems':
             # now split list of problems id by spaces or commas
             problems = re.split('\s*,*|\s*,\s*', self.list_of_problems)
             problems = filter(None, problems)
 
-        condition_reached = self.condition_on_problem_list(problems)
+        if problems:
+            condition_reached = self.condition_on_problem_list(problems)
 
         return condition_reached
 
