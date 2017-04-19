@@ -112,20 +112,15 @@ var viewblocks = {
 };
 
 var getActiveTab = function getActiveTab() {
-  // Find the ID of the active vertical
-  var activeVerticalID = $('#course-content #seq_content .xblock-student_view-vertical').data('usage-id');
-
-  // Get the tab from the sequence that points to this vertical
-  var $tab = $('#sequence-list a').filter(function filterFunc() {
-    return $(this).data('id') === activeVerticalID;
-  });
+  // return the active sequential button
+  $tab = $('#course-content #sequence-list button.active')[0];
 
   return $tab;
 };
 
 var execControl = function execControl(arg) {
   // Find the target tab
-  var $target = $('#sequence-list a').filter(function filterFunc() {
+  var $target = $('#sequence-list button').filter(function filterFunc() {
     return $(this).attr('id') === arg;
   });
 
@@ -136,8 +131,8 @@ var execControl = function execControl(arg) {
 
 var redirectToTab = function redirectToTab(arg) {
   var $activeTab = getActiveTab();
-  var currentID = $activeTab.attr('id');
-  var allTabs = $('#sequence-list a');
+  var currentID = $activeTab.id;
+  var allTabs = $('#sequence-list button');
   var firstTabIndex = 0;
   var firstTab = 'tab_' + firstTabIndex;
   var lastTabIndex = allTabs.length - 1;
@@ -145,9 +140,6 @@ var redirectToTab = function redirectToTab(arg) {
 
   if (currentID === arg) {
     window.clearTimeout(window.flowControlTimeoutID);
-
-    // Fix posible errors on the .active classes
-    $activeTab.parent().siblings().find('.active').removeClass('active');
   } else {
     var whereTo = null;
     if (settings.defaulTabId > lastTabIndex) {

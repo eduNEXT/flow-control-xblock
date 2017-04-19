@@ -49,7 +49,7 @@ def package_data(pkg, roots):
 
 setup(
     name='xblock-flow-control',
-    version='0.0.1',
+    version='0.0.2',
     description='XBlock - Flow Control',
     packages=[
         'flow_control',
