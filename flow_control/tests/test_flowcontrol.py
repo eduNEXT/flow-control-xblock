@@ -185,3 +185,54 @@ class TestBuilderBlocks(unittest.TestCase):
         fragment_mock.assert_called()
         fragment_instance.add_javascript.assert_called()
         fragment_instance.initialize_js.assert_called()
+
+    def test_has_null(self):
+        """
+        Test the conditions of which it passes the has_null check
+        Description: some problem has not been answered
+        """
+        self.assertFalse(self.block.has_null([1.0]))
+        self.assertFalse(self.block.has_null([1.0, 1.0]))
+        self.assertFalse(self.block.has_null([1.0, 1.0, 1.0]))
+        self.assertFalse(self.block.has_null([1.0, 0.0]))
+        self.assertFalse(self.block.has_null([0.0]))
+
+        self.assertTrue(self.block.has_null([1.0, None]))
+        self.assertTrue(self.block.has_null([0.0, None]))
+        self.assertTrue(self.block.has_null([None]))
+        self.assertTrue(self.block.has_null([None, None]))
+        self.assertTrue(self.block.has_null([]))
+
+    def test_are_all_null(self):
+        """
+        Test the conditions of which it passes the are_all_null check
+        Description: none of the problems have been answered
+        """
+        self.assertFalse(self.block.are_all_null([1.0]))
+        self.assertFalse(self.block.are_all_null([1.0, 1.0]))
+        self.assertFalse(self.block.are_all_null([1.0, 1.0, 1.0]))
+        self.assertFalse(self.block.are_all_null([1.0, 0.0]))
+        self.assertFalse(self.block.are_all_null([1.0, None]))
+        self.assertFalse(self.block.are_all_null([0.0]))
+        self.assertFalse(self.block.are_all_null([0.0, None]))
+
+        self.assertTrue(self.block.are_all_null([None]))
+        self.assertTrue(self.block.are_all_null([None, None]))
+        self.assertTrue(self.block.are_all_null([]))
+
+    def test_are_all_not_null(self):
+        """
+        Test the conditions of which it passes the are_all_not_null check
+        Description: all problems have been answered
+        """
+        self.assertFalse(self.block.are_all_not_null([1.0, None]))
+        self.assertFalse(self.block.are_all_not_null([None, None]))
+        self.assertFalse(self.block.are_all_not_null([None]))
+        self.assertFalse(self.block.are_all_not_null([0.0, None]))
+        self.assertFalse(self.block.are_all_not_null([]))
+
+        self.assertTrue(self.block.are_all_not_null([1.0]))
+        self.assertTrue(self.block.are_all_not_null([1.0, 1.0]))
+        self.assertTrue(self.block.are_all_not_null([1.0, 1.0, 1.0]))
+        self.assertTrue(self.block.are_all_not_null([1.0, 0.0]))
+        self.assertTrue(self.block.are_all_not_null([0.0]))
