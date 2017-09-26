@@ -307,7 +307,7 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
         """  Returns true when all problems have been answered """
         result = False
         all_problems_were_answered = all(problems_to_answer)
-        if all_problems_were_answered:
+        if problems_to_answer and all_problems_were_answered:
             result = True
         return result
 
@@ -315,18 +315,16 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
         """  Returns true when at least one problem have not been answered """
         result = False
         all_problems_were_answered = all(problems_to_answer)
-        if not all_problems_were_answered:
+        if not problems_to_answer or not all_problems_were_answered:
             result = True
         return result
 
     def are_all_null(self, problems_to_answer):
         """  Returns true when all problems have not been answered """
         result = False
-        all_problems_were_answered = all(problems_to_answer)
         not_answered_quantity = reduce(lambda x, y: x + (1 if not y else 0),
                                        problems_to_answer, 0)
-
-        if not all_problems_were_answered and not_answered_quantity == len(problems_to_answer):
+        if not problems_to_answer or not_answered_quantity == len(problems_to_answer):
             result = True
         return result
 
