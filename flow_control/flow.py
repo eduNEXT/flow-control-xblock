@@ -74,6 +74,17 @@ def _operators_generator(block):  # pylint: disable=unused-argument
     ]
 
 
+def n_all(iterable):
+    """
+    This iterator has the same logic of the function all() for an array.
+    But it only responds to the existence of None and not False
+    """
+    for element in iterable:
+        if element is None:
+            return False
+    return True
+
+
 @XBlock.needs("i18n")
 @XBlock.needs("user")
 # pylint: disable=too-many-ancestors
@@ -306,7 +317,7 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
     def are_all_not_null(self, problems_to_answer):
         """  Returns true when all problems have been answered """
         result = False
-        all_problems_were_answered = all(problems_to_answer)
+        all_problems_were_answered = n_all(problems_to_answer)
         if problems_to_answer and all_problems_were_answered:
             result = True
         return result
@@ -314,19 +325,17 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
     def has_null(self, problems_to_answer):
         """  Returns true when at least one problem have not been answered """
         result = False
-        all_problems_were_answered = all(problems_to_answer)
+        all_problems_were_answered = n_all(problems_to_answer)
         if not problems_to_answer or not all_problems_were_answered:
             result = True
         return result
 
     def are_all_null(self, problems_to_answer):
         """  Returns true when all problems have not been answered """
-        result = False
-        not_answered_quantity = reduce(lambda x, y: x + (1 if not y else 0),
-                                       problems_to_answer, 0)
-        if not problems_to_answer or not_answered_quantity == len(problems_to_answer):
-            result = True
-        return result
+        for element in problems_to_answer:
+            if element is not None:
+                return False
+        return True
 
     SPECIAL_COMPARISON_DISPATCHER = {
         'all_not_null': are_all_not_null,
