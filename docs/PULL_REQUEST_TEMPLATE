@@ -1,0 +1,21 @@
+# Description
+
+...
+
+Use this space to describe the feature this PR introduces.
+Try add enough information for the reviewers to understand what the intention is.
+
+...
+
+
+# Reviewers
+
+- [ ] who is the person reviewing this changes?
+- [ ] perhaps more than one?
+
+# After approval
+
+Keep in mind that after the change have been approved we might still need to do somethings.
+
+- [ ] Squash
+- [ ] Bumpversion (major/minor/patch)

@@ -28,6 +28,9 @@ import os
 from setuptools import setup
 
 
+__version__ = '0.2.0'
+
+
 # Functions #########################################################
 
 
@@ -49,7 +52,7 @@ def package_data(pkg, roots):
 
 setup(
     name='xblock-flow-control',
-    version='0.0.2',
+    version=__version__,
     description='XBlock - Flow Control',
     packages=[
         'flow_control',
