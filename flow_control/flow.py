@@ -238,6 +238,7 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
 
         return condition_reached
 
+    @XBlock.supports("multi_device")
     def student_view(self, context=None):  # pylint: disable=unused-argument
         """  Returns a fragment for student view  """
         fragment = Fragment(u"<!-- This is the FlowCheckPointXblock -->")
