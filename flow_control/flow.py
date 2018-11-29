@@ -206,7 +206,7 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
                 type_id=resource,
                 locator=locator)
         else:
-            course_url = course_url.split(course_prefix)[-1]
+            course_url = course_url.replace(course_prefix, '', 1)
 
             location_string = '{prefix}{couse_str}+{type}@{type_id}+{prefix}@{locator}'.format(
                 prefix=self.course_id.BLOCK_PREFIX,
