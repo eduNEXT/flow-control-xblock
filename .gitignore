@@ -1,3 +1,4 @@
 *.pyc
 /xblock_flow_control.egg-info/
 *.coverage
+.tox/
