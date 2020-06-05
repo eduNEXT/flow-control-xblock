@@ -3,6 +3,8 @@ Unit tests for flow-control
 """
 
 import unittest
+
+import ddt
 from mock import MagicMock, patch
 # from xblock.core import XBlock
 from xblock.field_data import DictFieldData
@@ -12,6 +14,7 @@ from flow_control.flow import (_actions_generator, _conditions_generator,
                                _operators_generator, load)
 
 
+@ddt.ddt
 class TestBuilderBlocks(unittest.TestCase):
     """ Unit tests for flow-control """
 
@@ -93,7 +96,12 @@ class TestBuilderBlocks(unittest.TestCase):
             load(path_mock)
             my_patch.assert_called_once_with('flow_control.flow', path_mock)
 
-    def test_get_location_string(self):
+    @ddt.data(
+        'course-v1:Course+course+course',
+        'test:Test+test+test',
+        'course:Test+course+course'
+    )
+    def test_get_location_string(self, course_string):
         """
         It should return the problem location string given its Id
         """
@@ -102,22 +110,24 @@ class TestBuilderBlocks(unittest.TestCase):
         resource = 'problem'
         locator = 'hbdf3883be0935'
         course_prefix = 'course'
-        resource = 'problem'
+
         self.block.course_id = MagicMock()
-        self.block.course_id.BLOCK_PREFIX = 'dsgdseg'
-        self.block.course_id.BLOCK_TYPE_PREFIX = 'dfsgesh'
-        course_url = self.block.course_id.to_deprecated_string()
-        course_url = course_url.split(course_prefix)[-1]
+        self.block.course_id.BLOCK_PREFIX = 'block-v1'
+        self.block.course_id.BLOCK_TYPE_PREFIX = 'type'
+        self.block.course_id.to_deprecated_string.return_value = course_string
+
+        course_replaced_url = course_string.replace(course_prefix, '', 1)
         # execute code
         result_string = self.block.get_location_string(locator)
 
         # asserts
-        testing_string = '{prefix}{couse_str}+{type}@{type_id}+{prefix}@{locator}'.format(
+        testing_string = '{prefix}{course_str}+{type}@{type_id}+{prefix}@{locator}'.format(
             prefix=self.block.course_id.BLOCK_PREFIX,
-            couse_str=course_url,
+            course_str=course_replaced_url,
             type=self.block.course_id.BLOCK_TYPE_PREFIX,
             type_id=resource,
-            locator=locator)
+            locator=locator,
+        )
 
         self.assertEqual(testing_string, result_string)
         self.block.course_id.to_deprecated_string.assert_called_with()
