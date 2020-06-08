@@ -7,7 +7,9 @@ pyyaml==3.11
 mako==1.0.4
 mock
 ddt==1.2.0
--e git://github.com/edx/xblock-sdk.git@v0.1.2#egg=xblock-sdk==v0.1.2
--e git://github.com/nosedjango/nosedjango.git@ed7d7f9aa969252ff799ec159f828eaa8c1cbc5a#egg=nosedjango-dev
+django-nose==1.4.6
+
+
+-e git://github.com/edx/xblock-sdk.git@v0.1.8#egg=xblock-sdk==v0.1.8
 # mock project for couserware.model_data
 -e git://github.com/edunext/mock-courseware-model_data.git@30409f54e2d51b3dbdd028597e0a28bdeb9d0455#egg=dev
