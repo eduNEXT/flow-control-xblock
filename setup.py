@@ -47,6 +47,28 @@ def package_data(pkg, roots):
 
     return {pkg: data}
 
+
+def is_requirement(line):
+    """
+    Return True if the requirement line is a package requirement;
+    that is, it is not blank, a comment, a URL, or an included file.
+    """
+    return line and not line.startswith(('-r', '#', '-e', 'git+', '-c'))
+
+
+def load_requirements(*requirements_paths):
+    """
+    Load all requirements from the specified requirements files.
+    Returns a list of requirement strings.
+    """
+    requirements = set()
+    for path in requirements_paths:
+        requirements.update(
+            line.split('#')[0].strip() for line in open(path).readlines()
+            if is_requirement(line)
+        )
+    return list(requirements)
+
 # Main ##############################################################
 
 
@@ -57,14 +79,14 @@ setup(
     packages=[
         'flow_control',
     ],
-    install_requires=[
-        'XBlock',
-    ],
+    install_requires=load_requirements('requirements/base.in'),
+    tests_require=load_requirements('requirements/test.in'),
     entry_points={
         'xblock.v1': [
             'flow-control = flow_control:FlowCheckPointXblock',
         ],
     },
+    include_package_data=True,
     package_data=package_data(
         "flow_control", ["templates", "public", "static"]),
 )

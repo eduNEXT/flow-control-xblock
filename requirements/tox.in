@@ -1,0 +1,3 @@
+# Tox is required for testing this XBlock
+
+tox                 # Allows testing with tox virtualenvs

@@ -1,0 +1,7 @@
+# Base requirements for using Flow-Control
+
+-c constraints.txt
+
+xblock                              # Base courseware component architecture
+xblock-utils                        # Provides utilities used by the Flow-Control XBlock
+edx-opaque-keys[django]             # Allows fetch scores from Courseware's ScoresClient

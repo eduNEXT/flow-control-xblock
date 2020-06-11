@@ -1,17 +1,18 @@
 ==================================
-XBlock flow-control |build-status|
+XBlock Flow Control |build-status|
 ==================================
 
-The Flow Control Xblock provides a way to display the content of a unit or to redirect the user elsewhere based on compliance with a condition that evaluates the submission or the score of a problem or a set of problems.
+The Flow Control XBlock provides a way to display the content of a unit or to redirect the user elsewhere based on compliance with a condition that evaluates the submission or the score of a problem or a set of problems.
 
-Installation
+Installing on Open edX Devstack
 ------------
 
-Install the requirements into the Python virtual environment of your `edx-platform` installation by running the following command from the root folder:
+Inside both LMS and Studio shells, using `make lms-shell` and `make studio-shell` in your devstack directory:
+* Clone this repository
+* Inside the newly downloaded directory, perform::
 
-```
-$ pip install -r requirements.txt
-```
+    make install
+
 
 Enabling in Studio
 -------------------
@@ -20,7 +21,7 @@ After successful installation, you can activate this component for a
 course following these steps:
 
 * From the main page of a specific course, navigate to `Settings -> Advanced Settings` from the top menu.
-* Check for the `Advanced Module List` policy key, and Add ``"flow-control"``` to the policy value list.
+* Check for the `Advanced Module List` policy key, and Add ``"flow-control"`` to the policy value list.
 * Click the "Save changes" button.
 
 Usage
@@ -31,6 +32,12 @@ Include the Flow Control component in the content unit you want to control acces
 * Enter the problem locator ids (as many as required) to evaluate the condition.
 * Select an action to apply when the condition is met.
 
+
+Development
+----------------
+You can install this XBlock's dependencies for development by performing::
+
+    make requirements
 
 Common use cases
 ----------------
@@ -75,15 +82,15 @@ Features include
 
 **WYSIWYG editor:** A simple to use HTML editor to simplify writing the content or message that learners will get if the condition is met.
 
-About this xblock
+About this XBlock
 -----------------
 
-The Flow control Xblock was built by `eduNEXT <https://www.edunext.co>`_, a company specialized in open edX development and open edX cloud services.
+The Flow Control XBlock was built by `eduNEXT <https://www.edunext.co>`_, a company specialized in open edX development and open edX cloud services.
 
 It was presented at the open edX con 2016 at Stanford University.
 
 
-How to contribute
+How to Contribute
 -----------------
 
 * Fork this repository.
