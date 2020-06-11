@@ -1,0 +1,8 @@
+# Code quality testing dependencies
+# These tests should be added soon.
+
+-c constraints.txt
+
+coverage                            # Code coverage testing for Python
+pep8                                # PEP 8 style conventions checker
+pylint       						# Static code analysis

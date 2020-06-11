@@ -1,0 +1,3 @@
+include README.rst
+include requirements/base.in
+include requirements/test.in
