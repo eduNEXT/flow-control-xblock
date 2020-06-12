@@ -5,7 +5,7 @@ XBlock Flow Control |build-status|
 The Flow Control XBlock provides a way to display the content of a unit or to redirect the user elsewhere based on compliance with a condition that evaluates the submission or the score of a problem or a set of problems.
 
 Installing on Open edX Devstack
-------------
+-------------------------------
 
 Inside both LMS and Studio shells, using `make lms-shell` and `make studio-shell` in your devstack directory:
 * Clone this repository
@@ -15,7 +15,7 @@ Inside both LMS and Studio shells, using `make lms-shell` and `make studio-shell
 
 
 Enabling in Studio
--------------------
+------------------
 
 After successful installation, you can activate this component for a 
 course following these steps:
@@ -34,7 +34,7 @@ Include the Flow Control component in the content unit you want to control acces
 
 
 Development
-----------------
+-----------
 You can install this XBlock's dependencies for development by performing::
 
     make requirements
@@ -99,5 +99,5 @@ How to Contribute
 * Wait for the code review and merge process
 
 
-.. |build-status| image:: https://travis-ci.org/eduNEXT/flow-control-xblock.svg?branch=master
-   :target: https://travis-ci.org/eduNEXT/flow-control-xblock
+.. |build-status| image:: https://circleci.com/gh/eduNEXT/flow-control-xblock.svg?style=svg
+    :target: https://circleci.com/gh/eduNEXT/flow-control-xblock
