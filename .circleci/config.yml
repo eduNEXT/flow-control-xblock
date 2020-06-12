@@ -53,14 +53,22 @@ jobs:
             echo -e "username = $PYPI_USERNAME" >> ~/.pypirc
             echo -e "password = $PYPI_PASSWORD" >> ~/.pypirc
       - run:
+          name: Prepare venv for distribution
+          command: |
+            virtualenv venv
+            source venv/bin/activate
+            pip install twine
+      - run:
           name: Create package
           command: |
             python setup.py sdist bdist_wheel
       - run:
           name: Check package
           command: |
+            source venv/bin/activate
             twine check dist/*
       - run:
           name: Upload to pypi
           command: |
+            source venv/bin/activate
             twine upload dist/*
