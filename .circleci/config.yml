@@ -7,6 +7,14 @@ workflows:
           matrix:
             parameters:
               python_version: ["2.7"]
+      - pypi:
+          requires:
+            - test
+          filters:
+            tags:
+              only: /[0-9]+(\.[0-9]+)*/
+            branches:
+              ignore: /.*/
 
 jobs:
   test:
@@ -29,3 +37,27 @@ jobs:
           command: tox -e ${python_version//./}
     environment:
       - python_version: py<< parameters.python_version >>
+  
+  pypi:
+    docker:
+      - image: circleci/python2.7
+    steps:
+      - checkout
+      - run:
+          name: Init .pypirc
+          command: |
+            echo $'[distutils]\nindex-servers = pypi\n[pypi]' > ~/.pypirc
+            echo -e "username = $PYPI_USERNAME" >> ~/.pypirc
+            echo -e "password = $PYPI_PASSWORD" >> ~/.pypirc
+      - run:
+          name: Create package
+          command: |
+            python setup.py sdist bdist_wheel
+      - run:
+          name: Check package
+          command: |
+            twine check dist/*
+      - run:
+          name: Upload to pypi
+          command: |
+            twine upload dist/*
