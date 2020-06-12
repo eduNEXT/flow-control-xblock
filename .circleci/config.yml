@@ -43,7 +43,7 @@ jobs:
   
   pypi:
     docker:
-      - image: circleci/python2.7
+      - image: circleci/python:2.7
     steps:
       - checkout
       - run:
