@@ -25,14 +25,24 @@ FlowControl Xblock setup file
 """
 
 import os
-from setuptools import setup
+import re
+import sys
+
+from setuptools import setup, find_packages
+from setuptools.command.install import install
 
 
-__version__ = '0.2.0'
+def get_version(*file_paths):
+    """Retrieves the version from the main app __init__.py"""
+    filename = os.path.join(os.path.dirname(__file__), *file_paths)
+    version_file = open(filename).read()
+    version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",
+                              version_file, re.M)
+    if version_match:
+        return version_match.group(1)
+    raise RuntimeError('Unable to find version string.')
 
-
-# Functions #########################################################
-
+__version__ = get_version("flow_control","__init__.py")
 
 def package_data(pkg, roots):
     """Generic function to find package_data.
@@ -69,15 +79,33 @@ def load_requirements(*requirements_paths):
         )
     return list(requirements)
 
+
 # Main ##############################################################
 
+with open("README.rst", "r") as file:
+    long_description = file.read()
 
 setup(
-    name='xblock-flow-control',
+    name='flow-control-xblock',
     version=__version__,
-    description='XBlock - Flow Control',
-    packages=[
-        'flow_control',
+    author='eduNEXT',
+    author_email='technical@edunext.co',
+    description='Flow Control XBlock',
+    long_description=long_description,
+    long_description_content_type='text/x-rst',
+    url='https://github.com/eduNEXT/flow-control-xblock',
+    packages=find_packages(),
+    classifiers=[
+        'Framework :: Django :: 1.11',
+        'Intended Audience :: Developers',
+        'Intended Audience :: Education',
+        'License :: OSI Approved :: GNU Affero General Public License v3',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Topic :: Internet',
+        'Topic :: Internet :: WWW/HTTP',
     ],
     install_requires=load_requirements('requirements/base.in'),
     tests_require=load_requirements('requirements/test.in'),
@@ -86,7 +114,8 @@ setup(
             'flow-control = flow_control:FlowCheckPointXblock',
         ],
     },
+    keywords='edunext xblock flowcontrol flow-control',
     include_package_data=True,
     package_data=package_data(
-        "flow_control", ["templates", "public", "static"]),
+        "flow_control", ["templates", "public", "static"])
 )

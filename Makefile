@@ -1,4 +1,4 @@
-.PHONY: help test install upgrade
+.PHONY: help test install upgrade requirements
 
 help: ## display this help message
 	@echo "Please use \`make <target>' where <target> is one of"
