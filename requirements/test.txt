@@ -8,8 +8,8 @@
 appdirs==1.4.4            # via fs
 backports.os==0.1.1       # via fs
 ddt==1.4.1                # via -r requirements/test.in
-django==1.11.29           # via edx-opaque-keys, nosedjango
-edx-opaque-keys[django]==2.0.2  # via -c requirements/constraints.txt, -r requirements/base.in
+django==1.11.29           # via edx-opaque-keys
+edx-opaque-keys[django]==2.0.2  # via -c requirements/constraints.txt, -r requirements/base.in, -r requirements/test.in
 enum34==1.1.10            # via ddt, fs
 fs==2.4.11                # via xblock
 future==0.18.2            # via backports.os
@@ -18,8 +18,6 @@ lxml==4.5.1               # via xblock
 mako==1.1.3               # via xblock-utils
 markupsafe==1.1.1         # via mako, xblock
 mock==1.0.1               # via -c requirements/constraints.txt, -r requirements/test.in
-nose==1.3.7               # via nosedjango
-nosedjango==1.1.0         # via -r requirements/test.in
 pbr==5.4.5                # via stevedore
 pymongo==3.10.1           # via edx-opaque-keys
 python-dateutil==2.8.1    # via xblock

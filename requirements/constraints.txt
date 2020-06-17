@@ -10,7 +10,7 @@
 
 
 # Fetches last opaque-keys version compatible with django 1.11
-edx-opaque-keys<2.1.0
+edx-opaque-keys>=0.3.1
 
 # Testing mock tool compatible with open-release/ironwood.master
 mock==1.0.1

@@ -2,8 +2,8 @@
 Unit tests for flow-control
 """
 
-import unittest
-
+#import unittest
+from django.test import TestCase
 import ddt
 from mock import MagicMock, patch
 # from xblock.core import XBlock
@@ -15,7 +15,7 @@ from flow_control.flow import (_actions_generator, _conditions_generator,
 
 
 @ddt.ddt
-class TestBuilderBlocks(unittest.TestCase):
+class TestBuilderBlocks(TestCase):
     """ Unit tests for flow-control """
 
     def setUp(self):
