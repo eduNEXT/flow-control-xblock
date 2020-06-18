@@ -1,5 +1,5 @@
 *.pyc
-/xblock_flow_control.egg-info/
+/flow_control_xblock.egg-info/
 *.coverage
 .tox/
 build/
