@@ -12,7 +12,9 @@ Change Log
 Unreleased
 ~~~~~~~~~~
 
-*
+* Support for Juniper/Python 3.5-3.8
+* Dropped support for Ironwood/Python 2.7
+
 
 [0.2.1] - 2020-06-12
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -21,4 +23,4 @@ Added
 _____
 
 * First release on PyPI.
-
+* Support for Ironwood/Python2.7

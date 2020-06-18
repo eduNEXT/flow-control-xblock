@@ -229,14 +229,14 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
 
         if self.problem_id and self.condition == 'single_problem':
             # now split problem id by spaces or commas
-            problems = re.split('\s*,*|\s*,\s*', self.problem_id)
-            problems = filter(None, problems)
+            problems = re.findall('\w+', self.problem_id)
+            problems = list(filter(None, problems))
             problems = problems[:1]
 
         if self.list_of_problems and self.condition == 'average_problems':
             # now split list of problems id by spaces or commas
-            problems = re.split('\s*,*|\s*,\s*', self.list_of_problems)
-            problems = filter(None, problems)
+            problems = re.findall('\w+', self.list_of_problems)
+            problems = list(filter(None, problems))
 
         if problems:
             condition_reached = self.condition_on_problem_list(problems)
@@ -397,7 +397,7 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
         usages_keys = map(_get_usage_key, problems)
         scores_client.fetch_scores(usages_keys)
         scores = map(scores_client.get, usages_keys)
-        scores = filter(None, scores)
+        scores = list(filter(None, scores))
 
         problems_to_answer = [score.total for score in scores]
         if self.operator in self.SPECIAL_COMPARISON_DISPATCHER.keys():
