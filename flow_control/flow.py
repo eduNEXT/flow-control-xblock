@@ -10,7 +10,12 @@ from xblock.fragment import Fragment
 from xblock.fields import Scope, Integer, String
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 from xblock.validation import ValidationMessage
-from lms.djangoapps.courseware.model_data import ScoresClient
+
+try:
+    from lms.djangoapps.courseware.model_data import ScoresClient
+except ImportError:
+    from courseware.model_data import ScoresClient
+
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys import InvalidKeyError
 
