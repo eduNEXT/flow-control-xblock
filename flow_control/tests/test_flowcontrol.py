@@ -2,13 +2,12 @@
 Unit tests for flow-control
 """
 
+import ddt
 import unittest
 
-import ddt
 from mock import MagicMock, patch
 # from xblock.core import XBlock
 from xblock.field_data import DictFieldData
-
 from flow_control.flow import FlowCheckPointXblock
 from flow_control.flow import (_actions_generator, _conditions_generator,
                                _operators_generator, load)

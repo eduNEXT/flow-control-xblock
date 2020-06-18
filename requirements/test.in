@@ -6,10 +6,11 @@
 
 mock                                # Stub out code with mock objects and make assertions about how they have been used
 ddt                                 # Run a test case multiple times with different input
-nosedjango       					# Nose testing for Django. Migration to Pytest should happen soon.
-
-# xblock-sdk==v0.1.2				# Not in use currently. To be curated.
+pytest
 # mako==1.0.2                       # Language for server-side page rendering. More tests should be added
 
 # eduNEXT mock project for couserware.model_data
--e git://github.com/edunext/mock-courseware-model_data.git@30409f54e2d51b3dbdd028597e0a28bdeb9d0455#egg=dev
+-e git+https://github.com/edunext/mock-courseware-model_data.git@30409f54e2d51b3dbdd028597e0a28bdeb9d0455#egg=dev
+
+# XBlock SDK to access Django Workbench Settings 
+# -e git+https://github.com/edx/xblock-sdk.git@21dac6a88fad2cf6d5588b0ee5a1e7c7d3b591fc#egg=xblock-sdk==0.1.6
