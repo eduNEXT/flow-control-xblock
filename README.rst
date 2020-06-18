@@ -1,18 +1,22 @@
 ==================================
-XBlock Flow Control |build-status|
+XBlock Flow Control
 ==================================
+|build-status| 
+|PyPI| 
+|PyPI license| 
 
 The Flow Control XBlock provides a way to display the content of a unit or to redirect the user elsewhere based on compliance with a condition that evaluates the submission or the score of a problem or a set of problems.
 
 Installing on Open edX Devstack
 -------------------------------
 
-Inside both LMS and Studio shells, using `make lms-shell` and `make studio-shell` in your devstack directory:
-* Clone this repository
-* Inside the newly downloaded directory, perform::
+Inside both LMS and Studio shells, using `make lms-shell` and `make studio-shell` in your devstack directory do::
 
-    make install
+    pip install flow-control-xblock
 
+However, if you want to further develop this XBlock, you might want to instead clone this repository and do::
+
+	pip install -e path/to/flow-control
 
 Enabling in Studio
 ------------------
@@ -101,3 +105,9 @@ How to Contribute
 
 .. |build-status| image:: https://circleci.com/gh/eduNEXT/flow-control-xblock.svg?style=svg
     :target: https://circleci.com/gh/eduNEXT/flow-control-xblock
+
+.. |PyPI license| image:: https://img.shields.io/pypi/l/flow-control-xblock.svg
+   :target: https://pypi.python.org/pypi/flow-control-xblock/
+
+.. |PyPI| image:: https://badge.fury.io/py/flow-control-xblock.svg
+    :target: https://badge.fury.io/py/flow-control-xblock

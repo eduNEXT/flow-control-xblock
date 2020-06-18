@@ -84,7 +84,6 @@ def load_requirements(*requirements_paths):
 
 with open("README.rst", "r") as file:
     long_description = file.read()
-
 setup(
     name='flow-control-xblock',
     version=__version__,
@@ -94,16 +93,18 @@ setup(
     long_description=long_description,
     long_description_content_type='text/x-rst',
     url='https://github.com/eduNEXT/flow-control-xblock',
+    python_requires=">=3.5.*",
     packages=find_packages(),
     classifiers=[
-        'Framework :: Django :: 1.11',
+        'Framework :: Django :: 2.2',
         'Intended Audience :: Developers',
         'Intended Audience :: Education',
         'License :: OSI Approved :: GNU Affero General Public License v3',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.8',
         'Topic :: Internet',
         'Topic :: Internet :: WWW/HTTP',
     ],

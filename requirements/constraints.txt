@@ -8,15 +8,21 @@
 # pin when possible.  Writing an issue against the offending project and
 # linking to it here is good.
 
+# Last Djagno version compatible with Juniper
+django<2.3
 
 # Fetches last opaque-keys version compatible with django 1.11
 edx-opaque-keys<2.1.0
 
-# Testing mock tool compatible with open-release/ironwood.master
+# Testing mock tool compatible with Juniper
 mock==1.0.1
 
-# XBlock version compatible with open-release/ironwood.master
+# stevedore 2.0.0 requires python >= 3.6
+stevedore<2.0.0
+
+# XBlock version compatible with Juniper
 xblock==1.2.2
 
-# Utilities compatible with open-release/ironwood.master
+# Utilities compatible with Juniper
 xblock-utils==1.2.0
+
