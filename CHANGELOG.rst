@@ -12,8 +12,21 @@ Change Log
 Unreleased
 ~~~~~~~~~~
 
+*
+
+
+[1.0.0] - 2020-06-18
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Added
+_____
+
 * Support for Juniper/Python 3.5-3.8
-* Dropped support for Ironwood/Python 2.7
+
+Removed
+_______
+
+* **BREAKING CHANGE**: Dropped support for Ironwood/Python 2.7
 
 
 [0.2.1] - 2020-06-12
