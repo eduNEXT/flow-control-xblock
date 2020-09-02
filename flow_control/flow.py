@@ -4,7 +4,6 @@
 import logging
 import pkg_resources
 import re
-from six import text_type
 
 from xblock.core import XBlock
 from xblock.fragment import Fragment
@@ -201,7 +200,7 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
         # pylint: disable=no-member
         course_prefix = 'course'
         resource = 'problem'
-        course_url = text_type(self.course_id)
+        course_url = str(self.course_id)
 
         if is_draft:
             course_url = course_url.split(self.course_id.run)[0]
