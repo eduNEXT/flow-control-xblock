@@ -200,7 +200,7 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
         # pylint: disable=no-member
         course_prefix = 'course'
         resource = 'problem'
-        course_url = self.course_id.to_deprecated_string()
+        course_url = str(self.course_id)
 
         if is_draft:
             course_url = course_url.split(self.course_id.run)[0]
