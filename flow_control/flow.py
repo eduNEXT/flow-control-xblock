@@ -5,6 +5,7 @@ import logging
 import pkg_resources
 import re
 
+from functools import reduce
 from xblock.core import XBlock
 from xblock.fragment import Fragment
 from xblock.fields import Scope, Integer, String
@@ -394,7 +395,7 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
             total = first_score['total'] + second_score['total']
             return {'total': total}
 
-        usages_keys = map(_get_usage_key, problems)
+        usages_keys = list(map(_get_usage_key, problems))
         scores_client.fetch_scores(usages_keys)
         scores = map(scores_client.get, usages_keys)
         scores = list(filter(None, scores))
@@ -407,7 +408,7 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
 
             return evaluation
 
-        reducible_scores = map(_to_reducible, scores)
+        reducible_scores = list(map(_to_reducible, scores))
         correct = reduce(_calculate_correct, reducible_scores,
                          correct_neutral)
         total = reduce(_calculate_total, reducible_scores,
