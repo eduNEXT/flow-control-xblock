@@ -113,7 +113,7 @@ class TestBuilderBlocks(unittest.TestCase):
         self.block.course_id = MagicMock()
         self.block.course_id.BLOCK_PREFIX = 'block-v1'
         self.block.course_id.BLOCK_TYPE_PREFIX = 'type'
-        self.block.course_id.to_deprecated_string.return_value = course_string
+        self.block.course_id.__str__.return_value = course_string
 
         course_replaced_url = course_string.replace(course_prefix, '', 1)
         # execute code
@@ -129,7 +129,7 @@ class TestBuilderBlocks(unittest.TestCase):
         )
 
         self.assertEqual(testing_string, result_string)
-        self.block.course_id.to_deprecated_string.assert_called_with()
+        self.block.course_id.__str__.assert_called_with()
 
     def test_get_condition_status(self):
         """
