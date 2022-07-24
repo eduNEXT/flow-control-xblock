@@ -49,13 +49,13 @@ Common use cases
 Flow Control can be used whenever you need to control the available course content based on grades obtained by a student, on one or more evaluated problems in the course. Also, it is possible to check if those problems have been answered or not.
 Some common uses cases are:
 
-* Only allow the learner to see unit B when a problem in unit A has been answered, otherwise displaying a explanatory message.
+* Only allow the learner to see unit B when a problem in unit A has been answered, otherwise displaying an explanatory message.
 * Only allow the learner to see unit B when a problem in unit A has been answered, otherwise redirecting to unit A.
 * Only allow the learner to see unit B when a problem in unit A has scored above a certain threshold.
-* Present further explanatory content to learners that did not answer correctly a certain problem, while redirecting to the next unit learners that did answer correcly.
+* Present further explanatory content to learners that did not answer correctly a certain problem, while redirecting to the next unit learners that did answer correctly.
 * Display a message congratulating the learner for passing an exam, or a message notifying the exam wasn't passed.
 * Display a message notifying the learner that some of the exam's questions have not been answered yet.
-* Used in combination with the subsection prerequites feature to better explain the learners why certain subsections will or will not be made available to them.
+* Used in combination with the subsection prerequisites feature to better explain the learners why certain subsections will or will not be made available to them.
 
 
 Features include
@@ -69,8 +69,8 @@ Features include
 
 * Equals
 * Not equal to
-* Greather than
-* Greather than or equal to
+* Greater than
+* Greater than or equal to
 * Less than
 * Less than or equal to
 * Is empty
