@@ -86,6 +86,8 @@ Features include
 
 **WYSIWYG editor:** A simple to use HTML editor to simplify writing the content or message that learners will get if the condition is met.
 
+**Support libraries:** You can use this Xblock with library content
+
 About this XBlock
 -----------------
 
