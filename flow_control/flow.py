@@ -196,11 +196,11 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
                 u"Score percentage field must "
                 u"be an integer number between 0 and 100"))
 
-    def get_location_string(self, locator, is_draft=False):
+    def get_location_string(self, locator, resource_type, is_draft=False):
         """  Returns the location string for one problem, given its id  """
         # pylint: disable=no-member
         course_prefix = 'course'
-        resource = 'problem'
+        resource = resource_type
         course_url = str(self.course_id)
 
         if is_draft:
@@ -220,7 +220,6 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
                 type=self.course_id.BLOCK_TYPE_PREFIX,
                 type_id=resource,
                 locator=locator)
-
         return location_string
 
     def get_condition_status(self):
@@ -359,18 +358,18 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
         total = 0
         correct = 0
 
-        def _get_usage_key(problem):
+        def _get_usage_key(problem, resource):
+            loc = self.get_location_string(problem, resource_type=resource)
 
-            loc = self.get_location_string(problem)
             try:
                 uk = UsageKey.from_string(loc)
             except InvalidKeyError:
-                uk = _get_draft_usage_key(problem)
+                uk = _get_draft_usage_key(problem, resource)
             return uk
 
-        def _get_draft_usage_key(problem):
+        def _get_draft_usage_key(problem, resource):
 
-            loc = self.get_location_string(problem, True)
+            loc = self.get_location_string(problem, resource_type=resource, is_draft=True)
             try:
                 uk = UsageKey.from_string(loc)
                 uk = uk.map_into_course(self.course_id)
@@ -395,7 +394,9 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
             total = first_score['total'] + second_score['total']
             return {'total': total}
 
-        usages_keys = list(map(_get_usage_key, problems))
+        resource_types = ['problem', 'h5pxblock']
+        usages_keys = [_get_usage_key(problem, resource_type) for resource_type in resource_types for problem in
+                       problems]
         scores_client.fetch_scores(usages_keys)
         scores = map(scores_client.get, usages_keys)
         scores = list(filter(None, scores))
