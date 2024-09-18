@@ -18,6 +18,9 @@ However, if you want to further develop this XBlock, you might want to instead c
 
 	pip install -e path/to/flow-control
 
+⚠️ Since the Open edX Olive release, some features could fail because of the integration of [Learning MFE](https://github.com/eduNEXT/frontend-app-learning).
+
+
 Enabling in Studio
 ------------------
 
