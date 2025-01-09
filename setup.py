@@ -93,7 +93,7 @@ setup(
     long_description=long_description,
     long_description_content_type='text/x-rst',
     url='https://github.com/eduNEXT/flow-control-xblock',
-    python_requires=">=3.5.*",
+    python_requires=">=3.8",
     packages=find_packages(),
     classifiers=[
         'Framework :: Django :: 2.2',
