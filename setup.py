@@ -93,18 +93,17 @@ setup(
     long_description=long_description,
     long_description_content_type='text/x-rst',
     url='https://github.com/eduNEXT/flow-control-xblock',
-    python_requires=">=3.5.*",
+    python_requires=">=3.11",
     packages=find_packages(),
     classifiers=[
-        'Framework :: Django :: 2.2',
+        'Framework :: Django :: 4.2',
         'Intended Audience :: Developers',
         'Intended Audience :: Education',
         'License :: OSI Approved :: GNU Affero General Public License v3',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.11',
         'Topic :: Internet',
         'Topic :: Internet :: WWW/HTTP',
     ],
@@ -113,6 +112,12 @@ setup(
     entry_points={
         'xblock.v1': [
             'flow-control = flow_control:FlowCheckPointXblock',
+        ],
+        'lms.djangoapp': [
+            "flow-control = flow_control.apps:FlowControlConfig",
+        ],
+        'cms.djangoapp': [
+            "flow-control = flow_control.apps:FlowControlConfig",
         ],
     },
     keywords='edunext xblock flowcontrol flow-control',
