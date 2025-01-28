@@ -1,12 +1,8 @@
 
 var settings = {
-  timeToCheck: 1,
-  tabTogo: null,
-  defaulTabId: null,
   defaultAction: 1,
   targetUrl: null,
   targetId: null,
-  lmsBaseJumpUrl: '../../../jump_to_id/',
   message: null,
   conditionReached: null,
   inStudioRuntime: false
@@ -14,7 +10,6 @@ var settings = {
 
 var actions = {
   noAct: 'No action',
-  redirectTab: 'to_unit',
   redirectUrl: 'to_url',
   redirectJump: 'to_jump',
   show_message: 'display_message'
@@ -44,7 +39,8 @@ var uiSelectors = {
 };
 
 var viewblocks = {
-  seqContent: $('#seq_content'),
+  seqContent: $('#course-content'),
+  loadingMessageHtml: "<div><p>Loading, please wait...</p></div>",
   hideNotAllowedOption: function hideNotAllowedOption() {
     $(uiSelectors.settingsFields).hide();
     $(uiSelectors.settingsFields).filter('[data-field-name="condition"]').show();
@@ -52,9 +48,6 @@ var viewblocks = {
     $(uiSelectors.settingsFields).filter('[data-field-name="operator"]').show();
 
     switch ($(uiSelectors.action).val()) {
-    case actions.redirectTab:
-      $(uiSelectors.settingsFields).filter('[data-field-name="tab_to"]').show();
-      break;
     case actions.redirectUrl:
       $(uiSelectors.settingsFields).filter('[data-field-name="target_url"]').show();
       break;
@@ -89,19 +82,13 @@ var viewblocks = {
       switch (settings.defaultAction) {
       case actions.noAct:
         break;
-      case actions.redirectTab:
-        viewblocks.seqContent.empty();
-        window.flowControlTimeoutID = window.setTimeout(redirectToTab,
-            settings.timeToCheck,
-            settings.tabTogo);
-        break;
       case actions.redirectUrl:
-        viewblocks.seqContent.empty();
-        location.href = settings.targetUrl;
+        viewblocks.seqContent.html(viewblocks.loadingMessageHtml);
+        window.parent.location.href = settings.targetUrl;
         break;
       case actions.redirectJump:
-        viewblocks.seqContent.empty();
-        location.href = settings.targetId;
+        viewblocks.seqContent.html(viewblocks.loadingMessageHtml);
+        window.parent.location.href = getJumpToIdUrl(settings.targetId);
         break;
       case actions.show_message:
         viewblocks.seqContent.html(settings.message);
@@ -111,59 +98,11 @@ var viewblocks = {
   }
 };
 
-var getActiveTab = function getActiveTab() {
-  // return the active sequential button
-  $tab = $('#course-content #sequence-list button.active')[0];
-
-  return $tab;
-};
-
-var execControl = function execControl(arg) {
-  // Find the target tab
-  var $target = $('#sequence-list button').filter(function filterFunc() {
-    return $(this).attr('id') === arg;
-  });
-
-  // Do the action
-  $target.click();
-  // TODO: can we make this silent. E.g. that it does not post to /handler/xmodule_handler/goto_position
-};
-
-var redirectToTab = function redirectToTab(arg) {
-  var $activeTab = getActiveTab();
-  var currentID = $activeTab.id;
-  var allTabs = $('#sequence-list button');
-  var firstTabIndex = 0;
-  var firstTab = 'tab_' + firstTabIndex;
-  var lastTabIndex = allTabs.length - 1;
-  var lastTab = 'tab_' + lastTabIndex;
-
-  if (currentID === arg) {
-    window.clearTimeout(window.flowControlTimeoutID);
-  } else {
-    var whereTo = null;
-    if (settings.defaulTabId > lastTabIndex) {
-      whereTo = lastTab;
-    }
-    if (settings.defaulTabId < firstTabIndex) {
-      whereTo = firstTab;
-    }
-    if (firstTabIndex <= settings.defaulTabId && settings.defaulTabId <= lastTabIndex) {
-      whereTo = arg;
-    }
-
-    execControl(whereTo);
-    window.flowControlTimeoutID = window.setTimeout(redirectToTab, settings.timeToCheck, whereTo);
-  }
-};
-
 function FlowControlGoto(runtime, element, options) {
   // Getting settings varibales to apply flow control
-  settings.tabTogo = options.default;
   settings.defaultAction = options.action;
   settings.targetUrl = options.target_url;
-  settings.targetId = settings.lmsBaseJumpUrl + options.target_id;
-  settings.defaulTabId = options.default_tab_id;
+  settings.targetId = options.target_id;
   settings.message = options.message;
   settings.inStudioRuntime = options.in_studio_runtime;
 
@@ -201,4 +140,17 @@ function EditFlowControl(runtime, element) {
 function StudioFlowControl(runtime, element) {
   $(uiSelectors.visibility).hide();
   $(uiSelectors.duplicate).hide();
+}
+
+function getCourseIdByUrl() {
+  const regex = /(?:block-v1:)(.+)(?:\+type)/;
+  const result = window.location.href.match(regex);
+  if (result) {
+    return result[1];
+  }
+  return null;
+}
+
+function getJumpToIdUrl(id) {
+  return `${window.location.origin}/courses/course-v1:${getCourseIdByUrl()}/jump_to_id/${id}`;
 }

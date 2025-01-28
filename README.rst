@@ -7,19 +7,16 @@ XBlock Flow Control
 
 The Flow Control XBlock provides a way to display the content of a unit or to redirect the user elsewhere based on compliance with a condition that evaluates the submission or the score of a problem or a set of problems.
 
-Installing on Open edX Devstack
--------------------------------
+Compatibility Notes
+===================
 
-Inside both LMS and Studio shells, using `make lms-shell` and `make studio-shell` in your devstack directory do::
-
-    pip install flow-control-xblock
-
-However, if you want to further develop this XBlock, you might want to instead clone this repository and do::
-
-	pip install -e path/to/flow-control
-
-⚠️ Since the Open edX Olive release, some features could fail because of the integration of [Learning MFE](https://github.com/eduNEXT/frontend-app-learning).
-
++------------------+--------------+
+| Open edX Release | Version      |
++==================+==============+
+| Redwood          | >= 2.0.0     |
++------------------+--------------+
+| Sumac            | >= 2.0.0     |
++------------------+--------------+
 
 Enabling in Studio
 ------------------
@@ -83,7 +80,7 @@ Features include
 **Actions:** This actions can be applied when a condition is met:
 
 * Display a message
-* Redirect to another unit in the same subsection (without reloading the page)
+* Redirect to another unit in the same subsection (without reloading the page) :warning:[DEPRECATED: Since version 2.0.0 and not working with the Learning MFE]
 * Redirect to another unit using jump_to_id (reloading the page)
 * Redirect to a given url
 

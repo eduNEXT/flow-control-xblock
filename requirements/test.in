@@ -10,7 +10,7 @@ pytest
 # mako==1.0.2                       # Language for server-side page rendering. More tests should be added
 
 # eduNEXT mock project for couserware.model_data
--e git+https://github.com/edunext/mock-courseware-model_data.git@30409f54e2d51b3dbdd028597e0a28bdeb9d0455#egg=dev
+# -e git+https://github.com/edunext/mock-courseware-model_data.git@30409f54e2d51b3dbdd028597e0a28bdeb9d0455#egg=dev
 
 # XBlock SDK to access Django Workbench Settings 
 # -e git+https://github.com/edx/xblock-sdk.git@21dac6a88fad2cf6d5588b0ee5a1e7c7d3b591fc#egg=xblock-sdk==0.1.6

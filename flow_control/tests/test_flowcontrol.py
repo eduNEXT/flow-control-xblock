@@ -39,8 +39,6 @@ class TestBuilderBlocks(unittest.TestCase):
              "value": "display_message"},
             {"display_name": "Redirect using jump_to_id",
              "value": "to_jump"},
-            {"display_name": "Redirect to a given unit in the same subsection",
-             "value": "to_unit"},
             {"display_name": "Redirect to a given URL",
              "value": "to_url"}
         ]

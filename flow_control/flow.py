@@ -12,10 +12,9 @@ from xblock.fields import Scope, Integer, String
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 from xblock.validation import ValidationMessage
 
-try:
-    from lms.djangoapps.courseware.model_data import ScoresClient
-except ImportError:
-    from courseware.model_data import ScoresClient
+from flow_control.edxapp_wrapper.score import (
+    score_module as ScoresClient,
+)
 
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys import InvalidKeyError
@@ -38,8 +37,6 @@ def _actions_generator(block):  # pylint: disable=unused-argument
          "value": "display_message"},
         {"display_name": "Redirect using jump_to_id",
          "value": "to_jump"},
-        {"display_name": "Redirect to a given unit in the same subsection",
-         "value": "to_unit"},
         {"display_name": "Redirect to a given URL",
          "value": "to_url"}
     ]
@@ -129,17 +126,13 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
                         scope=Scope.content,
                         display_name="Score percentage")
 
-    tab_to = Integer(help="Number of unit tab to redirect to. (1, 2, 3...)",
-                     default=1,
-                     scope=Scope.content,
-                     display_name="Tab to redirect to")
-
     target_url = String(help="URL to redirect to, supports relative "
                         "or absolute urls",
                         scope=Scope.content,
                         display_name="URL to redirect to")
 
-    target_id = String(help="Unit identifier to redirect to (Location id)",
+    target_id = String(help="Unit identifier to redirect to (Location id). "
+                        "Use this action to redirect to any course unit.",
                        scope=Scope.content,
                        display_name="Unit identifier to redirect to")
 
@@ -175,26 +168,9 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
                        'operator',
                        'ref_value',
                        'action',
-                       'tab_to',
                        'target_url',
                        'target_id',
                        'message')
-
-    def validate_field_data(self, validation, data):
-        """
-        Validate this block's field data
-        """
-
-        if data.tab_to <= 0:
-            validation.add(ValidationMessage(
-                ValidationMessage.ERROR,
-                u"Tab to redirect to must be greater than zero"))
-
-        if data.ref_value < 0 or data.ref_value > 100:
-            validation.add(ValidationMessage(
-                ValidationMessage.ERROR,
-                u"Score percentage field must "
-                u"be an integer number between 0 and 100"))
 
     def get_location_string(self, locator, is_draft=False):
         """  Returns the location string for one problem, given its id  """
@@ -253,13 +229,10 @@ class FlowCheckPointXblock(StudioEditableXBlockMixin, XBlock):
         # pylint: disable=no-member
         in_studio_runtime = hasattr(self.xmodule_runtime, 'is_author_mode')
         index_base = 1
-        default_tab = 'tab_{}'.format(self.tab_to - index_base)
 
         fragment.initialize_js(
             'FlowControlGoto',
             json_args={"display_name": self.display_name,
-                       "default": default_tab,
-                       "default_tab_id": self.tab_to,
                        "action": self.action,
                        "target_url": self.target_url,
                        "target_id": self.target_id,
