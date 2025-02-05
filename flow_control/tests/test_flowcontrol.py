@@ -89,9 +89,15 @@ class TestBuilderBlocks(unittest.TestCase):
         It should return the corresponding resource
         """
         path_mock = MagicMock()
-        with patch('importlib.resources.files') as my_patch:
-            load(path_mock)
-            my_patch.assert_called_once_with('flow_control.flow').joinpath(path_mock).read_text(encoding="utf-8")
+
+        with patch("importlib.resources.files") as mock_files:
+            mock_package = mock_files.return_value
+            mock_path = mock_package.joinpath.return_value
+            with patch.object(mock_path, "read_text") as mock_read_text:
+                load(path_mock)
+                mock_files.assert_called_once_with("flow_control.flow")
+                mock_package.joinpath.assert_called_once_with(path_mock)
+                mock_read_text.assert_called_once_with(encoding="utf-8")
 
     @ddt.data(
         'course-v1:Course+course+course',
