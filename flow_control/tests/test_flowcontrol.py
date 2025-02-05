@@ -5,7 +5,7 @@ Unit tests for flow-control
 import ddt
 import unittest
 
-from mock import MagicMock, patch
+from mock import MagicMock, patch, mock_open
 # from xblock.core import XBlock
 from xblock.field_data import DictFieldData
 from flow_control.flow import FlowCheckPointXblock
@@ -85,22 +85,13 @@ class TestBuilderBlocks(unittest.TestCase):
         self.assertEqual(operators, operators_allowed)
 
     def test_load(self):
-        """
-        It should return the corresponding resource
-        """
+        """It should return the corresponding resource"""
         path_mock = "test_resource.txt"
+        mock_content = "mocked content"
 
-        with patch("importlib.resources.files") as files_mock:
-            file_path_mock = MagicMock()
-            file_path_mock.read_text.return_value = "mocked content"
-
-            files_mock.return_value.joinpath.return_value = file_path_mock
-
+        with patch("pathlib.Path.open", mock_open(read_data=mock_content)):
             result = load(path_mock)
-
-            files_mock.assert_called_once_with("flow_control.flow")
-            file_path_mock.read_text.assert_called_once_with(encoding="utf-8")
-            self.assertEqual(result, "mocked content")
+            self.assertEqual(result, mock_content)
 
     @ddt.data(
         'course-v1:Course+course+course',
