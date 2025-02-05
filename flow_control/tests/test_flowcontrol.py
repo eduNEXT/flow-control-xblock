@@ -88,16 +88,20 @@ class TestBuilderBlocks(unittest.TestCase):
         """
         It should return the corresponding resource
         """
-        path_mock = MagicMock()
+        path_mock = "test_resource.txt"
 
-        with patch("importlib.resources.files") as mock_files:
-            mock_package = mock_files.return_value
-            mock_path = mock_package.joinpath.return_value
-            with patch.object(mock_path, "read_text") as mock_read_text:
-                load(path_mock)
-                mock_files.assert_called_once_with(__package__)
-                mock_package.joinpath.assert_called_once_with(path_mock)
-                mock_read_text.assert_called_once_with(encoding="utf-8")
+        with patch("importlib.resources.files") as files_mock, patch("importlib.resources.as_file") as as_file_mock:
+            file_path_mock = MagicMock()
+            files_mock.return_value.joinpath.return_value = file_path_mock
+            as_file_mock.return_value.__enter__.return_value = file_path_mock
+            file_path_mock.read_text.return_value = "mocked content"
+
+            result = load(path_mock)
+
+            files_mock.assert_called_once_with("flow_control.flow")
+            file_path_mock.read_text.assert_called_once_with(encoding="utf-8")
+            assert result == "mocked content"
+
 
     @ddt.data(
         'course-v1:Course+course+course',
