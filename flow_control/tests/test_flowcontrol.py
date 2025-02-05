@@ -84,17 +84,17 @@ class TestBuilderBlocks(unittest.TestCase):
         ]
         self.assertEqual(operators, operators_allowed)
 
-    def test_load(self):
+    def test_load():
         """
         It should return the corresponding resource
         """
         path_mock = "test_resource.txt"
 
-        with patch("importlib.resources.files") as files_mock, patch("importlib.resources.as_file") as as_file_mock:
+        with patch("importlib.resources.files") as files_mock:
             file_path_mock = MagicMock()
-            files_mock.return_value.joinpath.return_value = file_path_mock
-            as_file_mock.return_value.__enter__.return_value = file_path_mock
             file_path_mock.read_text.return_value = "mocked content"
+
+            files_mock.return_value.joinpath.return_value = file_path_mock
 
             result = load(path_mock)
 
