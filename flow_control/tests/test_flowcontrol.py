@@ -95,7 +95,7 @@ class TestBuilderBlocks(unittest.TestCase):
             mock_path = mock_package.joinpath.return_value
             with patch.object(mock_path, "read_text") as mock_read_text:
                 load(path_mock)
-                mock_files.assert_called_once_with("flow_control.flow")
+                mock_files.assert_called_once_with("flow_control")
                 mock_package.joinpath.assert_called_once_with(path_mock)
                 mock_read_text.assert_called_once_with(encoding="utf-8")
 
