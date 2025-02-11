@@ -14,6 +14,17 @@ Unreleased
 
 *
 
+[2.0.1] - 2025-02-05
+**********************************************
+
+Changed
+=======
+
+* **Replaced `pkg_resources` with `importlib.resources`**  
+  - `pkg_resources` (from `setuptools`) is deprecated and may be removed in future Python versions.  
+  - Now using `importlib.resources`, the recommended alternative for managing package resources.  
+  - This improves performance and ensures better compatibility with modern Python versions.  
+
 [2.0.0] - 2025-01-23
 **********************************************
 

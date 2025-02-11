@@ -2,7 +2,7 @@
  either display the unit's content or take an alternative action """
 
 import logging
-import pkg_resources
+from importlib.resources import files as importlib_files
 import re
 
 from functools import reduce
@@ -24,8 +24,7 @@ LOGGER = logging.getLogger(__name__)
 
 def load(path):
     """Handy helper for getting resources from our kit."""
-    data = pkg_resources.resource_string(__name__, path)
-    return data.decode("utf8")
+    return importlib_files(__package__).joinpath(path).read_text(encoding="utf-8")
 
 
 def _actions_generator(block):  # pylint: disable=unused-argument
