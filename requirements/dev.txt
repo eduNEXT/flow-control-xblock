@@ -6,7 +6,7 @@
 #
 asgiref==3.8.1
     # via django
-astroid==3.3.8
+astroid==3.3.10
     # via
     #   -r requirements/quality.txt
     #   pylint
@@ -18,7 +18,7 @@ build==1.2.2.post1
     # via
     #   -r requirements/pip-tools.txt
     #   pip-tools
-certifi==2024.12.14
+certifi==2025.6.15
     # via
     #   -r requirements/ci.txt
     #   requests
@@ -28,23 +28,23 @@ cffi==1.17.1
     #   cryptography
 chardet==5.2.0
     # via diff-cover
-charset-normalizer==3.4.1
+charset-normalizer==3.4.2
     # via
     #   -r requirements/ci.txt
     #   requests
-click==8.1.8
+click==8.2.1
     # via
     #   -r requirements/pip-tools.txt
     #   pip-tools
-coverage==7.6.10
+coverage==7.9.1
     # via -r requirements/quality.txt
-cryptography==44.0.0
+cryptography==45.0.4
     # via
     #   -r requirements/ci.txt
     #   secretstorage
-diff-cover==9.2.1
+diff-cover==9.3.2
     # via -r requirements/dev.in
-dill==0.3.9
+dill==0.4.0
     # via
     #   -r requirements/quality.txt
     #   pylint
@@ -52,7 +52,7 @@ distlib==0.3.9
     # via
     #   -r requirements/ci.txt
     #   virtualenv
-django==4.2.18
+django==4.2.23
     # via
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   edx-i18n-tools
@@ -60,9 +60,9 @@ docutils==0.21.2
     # via
     #   -r requirements/ci.txt
     #   readme-renderer
-edx-i18n-tools==1.6.3
+edx-i18n-tools==1.9.0
     # via -r requirements/dev.in
-filelock==3.17.0
+filelock==3.18.0
     # via
     #   -r requirements/ci.txt
     #   tox
@@ -75,11 +75,11 @@ idna==3.10
     # via
     #   -r requirements/ci.txt
     #   requests
-importlib-metadata==8.6.1
+importlib-metadata==8.7.0
     # via
     #   -r requirements/ci.txt
     #   keyring
-isort==5.13.2
+isort==6.0.1
     # via
     #   -r requirements/quality.txt
     #   pylint
@@ -95,22 +95,22 @@ jaraco-functools==4.1.0
     # via
     #   -r requirements/ci.txt
     #   keyring
-jeepney==0.8.0
+jeepney==0.9.0
     # via
     #   -r requirements/ci.txt
     #   keyring
     #   secretstorage
-jinja2==3.1.5
+jinja2==3.1.6
     # via diff-cover
 keyring==25.6.0
     # via
     #   -r requirements/ci.txt
     #   twine
-lxml[html-clean,html_clean]==5.3.0
+lxml[html-clean,html_clean]==5.4.0
     # via
     #   edx-i18n-tools
     #   lxml-html-clean
-lxml-html-clean==0.4.1
+lxml-html-clean==0.4.2
     # via lxml
 markdown-it-py==3.0.0
     # via
@@ -126,16 +126,16 @@ mdurl==0.1.2
     # via
     #   -r requirements/ci.txt
     #   markdown-it-py
-more-itertools==10.6.0
+more-itertools==10.7.0
     # via
     #   -r requirements/ci.txt
     #   jaraco-classes
     #   jaraco-functools
-nh3==0.2.20
+nh3==0.2.21
     # via
     #   -r requirements/ci.txt
     #   readme-renderer
-packaging==24.2
+packaging==25.0
     # via
     #   -r requirements/ci.txt
     #   -r requirements/pip-tools.txt
@@ -148,13 +148,13 @@ pep8==1.7.1
     # via -r requirements/quality.txt
 pip-tools==7.4.1
     # via -r requirements/pip-tools.txt
-platformdirs==4.3.6
+platformdirs==4.3.8
     # via
     #   -r requirements/ci.txt
     #   -r requirements/quality.txt
     #   pylint
     #   virtualenv
-pluggy==1.5.0
+pluggy==1.6.0
     # via
     #   -r requirements/ci.txt
     #   diff-cover
@@ -175,7 +175,7 @@ pygments==2.19.1
     #   diff-cover
     #   readme-renderer
     #   rich
-pylint==3.3.3
+pylint==3.3.7
     # via -r requirements/quality.txt
 pyproject-hooks==1.2.0
     # via
@@ -188,7 +188,7 @@ readme-renderer==44.0
     # via
     #   -r requirements/ci.txt
     #   twine
-requests==2.32.3
+requests==2.32.4
     # via
     #   -r requirements/ci.txt
     #   id
@@ -202,7 +202,7 @@ rfc3986==2.0.0
     # via
     #   -r requirements/ci.txt
     #   twine
-rich==13.9.4
+rich==14.0.0
     # via
     #   -r requirements/ci.txt
     #   twine
@@ -216,7 +216,7 @@ six==1.17.0
     #   tox
 sqlparse==0.5.3
     # via django
-tomlkit==0.13.2
+tomlkit==0.13.3
     # via
     #   -r requirements/quality.txt
     #   pylint
@@ -234,7 +234,7 @@ urllib3==2.2.3
     #   -r requirements/ci.txt
     #   requests
     #   twine
-virtualenv==20.29.1
+virtualenv==20.31.2
     # via
     #   -r requirements/ci.txt
     #   tox
@@ -242,7 +242,7 @@ wheel==0.45.1
     # via
     #   -r requirements/pip-tools.txt
     #   pip-tools
-zipp==3.21.0
+zipp==3.23.0
     # via
     #   -r requirements/ci.txt
     #   importlib-metadata
