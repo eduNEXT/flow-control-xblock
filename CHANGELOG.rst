@@ -14,6 +14,16 @@ Unreleased
 
 *
 
+[2.3.0] - 2026-06-26
+~~~~~~~~~~~~~~~~~~~~~
+
+Added
+_____
+
+* Add support for Verawood release.
+* Drop support for Python 3.11 (Verawood requires Python 3.12+).
+* Drop support for Django 4.2 (Verawood requires Django 5.2+).
+
 2.2.0 - 2025-10-14
 **********************************************
 
